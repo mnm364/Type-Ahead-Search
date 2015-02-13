@@ -1,3 +1,3 @@
-# quoraChall01_typeaheadSearch
+# typeaheadSearch
 
 README
