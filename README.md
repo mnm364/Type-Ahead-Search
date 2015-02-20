@@ -1,3 +1,3 @@
-# typeaheadSearch
+# Type Ahead Search
 
 README
