@@ -6,14 +6,14 @@
  */
 public class CompressedMTrie {
 	
-	private DoubleHashedHashMap<TrieNode> root;
+	private DoubleHashedHashMap<TrieHashNode> root;
 	
-	private final class TrieNode {
+	private final class TrieHashNode {
 		
-		/* character to be used in Trie. */
+		/* Character to be used in Trie. */
 		private char val;
 		
-		/* mark leaf nodes. */
+		/* Boolean to mark leaf nodes. */
 		private boolean leaf;
 		
 		/* ??identify if compressed string node 
@@ -21,25 +21,26 @@ public class CompressedMTrie {
 		 */
 		private boolean str;
 		
-		/* pointer? to subsequent hash map */
-		private DoubleHashedHashMap<TrieNode> child;
+		/* Pointer? to subsequent hash map. */
+		private DoubleHashedHashMap<TrieHashNode> child;
 		
-		//TODO - make this point to an Entry
+		//TODO - make this list of pointers to entries
 		/* list of pointers to unordered master Set */
 		private Set<Entry> eSet;
 		
-		private TrieNode(char val, boolean leaf, boolean str, DoubleHashedHashMap<TrieNode> child, Entry e) {
+		private TrieHashNode(char val, boolean leaf, boolean str, DoubleHashedHashMap<TrieHashNode> child, Entry e) {
 			this.val	= val;
 			this.leaf	= leaf;
 			this.str	= str;
 			this.child	= child;
-			
+
 			this.eSet.add(e);
 		}
 		
 	}
 	
 	/**
+	 * Inserts a string into the trie,
 	 * 
 	 * @param str the string to insert
 	 * @return true if insert successful; false otherwise
@@ -50,9 +51,15 @@ public class CompressedMTrie {
 	}
 	
 	/**
+	 * Removes string from trie, two different uses.
+	 * 	1) If string is non-unique or a prefix to another string, just remove id from ptr list.
+	 * 	2) If string is unique (i.e. no other ptrs in list), remove entire string from trie.
+	 * ISSUES: need to search through Set of Entries to find one to delete (linear search is not efficient, others take up more space)
+	 * -maybe need a skip list structure...
 	 * 
-	 * @param str
-	 * @return
+	 * @param str the str to remove
+	 * @param id the id associated with the str
+	 * @return 
 	 */
 	public boolean remove(String str, float id) {
 		//TODO - method stub
@@ -61,7 +68,8 @@ public class CompressedMTrie {
 	
 	/**
 	 * 
-	 * @return
+	 * 
+	 * @return true if compression happened; otherwise, false
 	 */
 	private boolean compress() {
 		//TODO - method stub

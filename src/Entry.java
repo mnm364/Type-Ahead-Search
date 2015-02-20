@@ -15,27 +15,50 @@ public class Entry {
 	/** Score given to the entry to weight results */
 	private float score;
 	
+	private String dataStr;
+	
 	/** Constructor 
 	 * @param id the unique id
 	 * @param type (user | topic | question | board) 
 	 * @param score used to weight results
 	 */
-	public Entry(String id, char type, float score) {
+	public Entry(String id, char type, float score, String dataStr) {
 	//	initialize values
 		this.id 	= id;
 		this.type 	= type;
 		this.score	= score;
+		this.dataStr= dataStr;
 	}
 	
+	/**
+	 * ID getter method.
+	 * @return the id
+	 */
 	public String getId() { 
 		return this.id;
 	}
 	
+	/**
+	 * Type getter method.
+	 * @return the type
+	 */
 	public char getType() {
 		return this.type;
 	}
 	
+	/**
+	 * Score getter method.
+	 * @return the score
+	 */
 	public float getScore() {
 		return this.score;
+	}
+	
+	/**
+	 * Data string getter method.
+	 * @return the data string
+	 */
+	public String getDataStr() {
+		return dataStr;
 	}
 }
