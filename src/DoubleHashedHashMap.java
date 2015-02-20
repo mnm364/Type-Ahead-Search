@@ -4,7 +4,7 @@ import java.io.Serializable;
  * This is a generic Double Hashed Hash Map. It
  * takes a parameter K.
  * 
- * @author Jeffrey Sham
+ * @author Jeffrey Sham, Michael Miller
  *
  * @param <K>
  */

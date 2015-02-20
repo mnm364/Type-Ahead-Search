@@ -1,5 +1,8 @@
 /*
+ * This is a the entry data type that holds 
+ * the value of the ADD commmand
  * 
+ * @author Michael Miller, Jeffrey Sham
  */
 public class Entry {
 	
