@@ -8,41 +8,51 @@ public class CompressedMTrie {
 	
 	private DoubleHashedHashMap<TrieHashNode> root;
 	
-	private final class TrieStrNode {
-		//private 
-		
-	}
-	
-	private final class TrieHashNode {
-		
-		/* Character to be used in Trie. */
-		private char val;
-		
+	private class TrieNode {
 		/* Boolean to mark leaf nodes. */
-		private boolean leaf;
-		
-		/* ??identify if compressed string node 
-		 * This does not make sense to be here but a good reminder to deal with compression
-		 */
-		private boolean str;
+		protected boolean leaf;
 		
 		/* Pointer? to subsequent hash map. */
-		private DoubleHashedHashMap<TrieHashNode> child;
+		protected DoubleHashedHashMap<TrieHashNode> child;
 		
 	//	TODO - make this list of pointers to entries
 	//	TODO - make this a skip list data structure
 		/* list of pointers to unordered master Set */
-		private Set<Entry> eSet;
+		protected Set<Entry> eSet;
+		
+		/**
+		 * Returns if node is leaf or not.
+		 * @return true if leaf; false otherwise
+		 */
+		private boolean isLeaf() {
+			return leaf;
+		}
+		
+	}
+	
+	private class TrieStrNode extends TrieNode {
+		
+		/* String to be used in Trie. */
+		private String val;
+		
+		
+		private TrieStrNode() {
+			
+		}
+	}
+	
+	private final class TrieHashNode extends TrieNode {
+		
+		/* Character to be used in Trie. */
+		private char val;
 		
 		private TrieHashNode(char val, boolean leaf, boolean str, DoubleHashedHashMap<TrieHashNode> child, Entry e) {
 			this.val	= val;
 			this.leaf	= leaf;
-			this.str	= str;
 			this.child	= child;
 
 			this.eSet.add(e);
 		}
-		
 	}
 	
 	/**
