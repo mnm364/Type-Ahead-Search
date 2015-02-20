@@ -26,4 +26,16 @@ public class Entry {
 		this.type 	= type;
 		this.score	= score;
 	}
+	
+	public String getId() { 
+		return this.id;
+	}
+	
+	public char getType() {
+		return this.type;
+	}
+	
+	public float getScore() {
+		return this.score;
+	}
 }
