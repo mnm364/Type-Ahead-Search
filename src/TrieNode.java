@@ -1,5 +1,5 @@
 
-public class TrieNode {
+public final class TrieNode {
 	
 	private char ch;
 	private DoubleHashedHashMap<TrieNode> next;

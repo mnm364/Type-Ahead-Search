@@ -1,4 +1,5 @@
-//'K' should be changed to 'T'
+//TODO - 'K' should be changed to 'T'
+//TODO - make initial capacity definable in constructor (want to make it small for Trie)
 
 import java.io.Serializable;
 
@@ -19,6 +20,7 @@ public class DoubleHashedHashMap<K> {
 	/** The default initial capacity of the hash map.
 	 */
 	private static final int DEFAULT_INITIAL_CAPACITY = 11;
+
 	
 	/** The default load factor of the hash map.
 	 */

@@ -1,11 +1,9 @@
-
 public class Set<T> {
-	//field variable
+
 	private T[] theSet;
 	private int size; //# of items in Set
 	private static final int START_SIZE = 5; 
 
-	//constructor
 	public Set() {
 		theSet = (T[]) new Object[START_SIZE]; //declare array of type <T>, causes warning
 		size = 0;
@@ -29,17 +27,11 @@ public class Set<T> {
 		}
 	}
 
-	/** Add an item to the set, no duplicates allowed.
-	   @param o the item to add
-	   @return true if added, false otherwise (was duplicate)
+	/** Add an item to the set, don't care about and don't check for duplicates.
+	 * @param o the item to add
+	 * @return true if added, false otherwise (was duplicate)
 	*/
 	public final boolean add(final Object o) {
-		//check to see if there is already a copy in array
-		for (int i = 0; i < size; i++) {
-			if (theSet[i].equals(o)) {
-				return false;
-			}
-		}
 		//doubles size of array if full
 		if (size == this.theSet.length) {
 			//create temp array to hold value of theSet[]
@@ -55,8 +47,8 @@ public class Set<T> {
 	}
 
 	/** Remove an item from the set if it's there.
-	   @param o the item to remove
-	   @return true if removed, false if not found
+	 * @param o the item to remove
+	 * @return true if removed, false if not found
 	*/
 	public final boolean remove(final Object o) {
 		if (this.isEmpty()) {
@@ -80,8 +72,8 @@ public class Set<T> {
 	}
 
 	/** Create the union of two sets, no duplicates.
-	   @param that the other set to union with this
-	   @return a new set which contains all the elements in this and that
+	 * @param that the other set to union with this
+	 * @return a new set which contains all the elements in this and that
 	*/
 	public final Set<T> union(final Set<T> that) {
 		Set<T> union = new Set <T>();
@@ -103,10 +95,10 @@ public class Set<T> {
 	}
 
 	/** Create the intersection of two sets, which is every item that
-	   appears in both sets.  For example, if this is {2, 3, 1, 4} and
-	   that is {3, 10, 2} then the intersection is {2, 3}.
-	   @param that the other set to union with this
-	   @return a new set which is (this intersect that)
+	 * appears in both sets.  For example, if this is {2, 3, 1, 4} and
+	 * that is {3, 10, 2} then the intersection is {2, 3}.
+	 * @param that the other set to union with this
+	 * @return a new set which is (this intersect that)
 	*/
 	public final Set<T> intersect(final Set<T> that) {
 		//store values of intersection
@@ -143,9 +135,6 @@ public class Set<T> {
         return -1; //nothing found
 	}
 
-	/* This method is inherited from Object, and should be overridden to
-	* return the set contents in classic format such as "{1, 5, 2, 6}".
-	*/
 	@Override
 	public String toString() {
 		if (this.size == 0) {

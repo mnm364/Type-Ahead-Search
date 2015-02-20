@@ -1,4 +1,4 @@
-/*
+/**
  * This is a the entry data type that holds 
  * the value of the ADD commmand
  * 
@@ -6,16 +6,16 @@
  */
 public class Entry {
 	
-	/* Unique ID */
+	/** Unique ID for each entry */
 	private String id;
 	
-	/* Entry type (user | topic | question | board) */
+	/** Entry type (user | topic | question | board) */
 	private char type;
 	
-	/* Score given to the entry to weight results */
+	/** Score given to the entry to weight results */
 	private float score;
 	
-	/* Constructor 
+	/** Constructor 
 	 * @param id the unique id
 	 * @param type (user | topic | question | board) 
 	 * @param score used to weight results
