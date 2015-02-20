@@ -1,3 +1,5 @@
+//TODO - should be called a Bag if duplicates are allowed!
+
 public class Set<T> {
 
 	private T[] theSet;

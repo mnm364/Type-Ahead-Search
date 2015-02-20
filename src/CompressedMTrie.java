@@ -8,6 +8,11 @@ public class CompressedMTrie {
 	
 	private DoubleHashedHashMap<TrieHashNode> root;
 	
+	private final class TrieStrNode {
+		//private 
+		
+	}
+	
 	private final class TrieHashNode {
 		
 		/* Character to be used in Trie. */
@@ -24,7 +29,8 @@ public class CompressedMTrie {
 		/* Pointer? to subsequent hash map. */
 		private DoubleHashedHashMap<TrieHashNode> child;
 		
-		//TODO - make this list of pointers to entries
+	//	TODO - make this list of pointers to entries
+	//	TODO - make this a skip list data structure
 		/* list of pointers to unordered master Set */
 		private Set<Entry> eSet;
 		
@@ -46,7 +52,11 @@ public class CompressedMTrie {
 	 * @return true if insert successful; false otherwise
 	 */
 	public boolean insert(String str) {
-		//TODO - method stub
+		
+		/* base case */
+		if (root == null) {
+			
+		}
 		return false;
 	}
 	
@@ -62,9 +72,14 @@ public class CompressedMTrie {
 	 * @return 
 	 */
 	public boolean remove(String str, float id) {
-		//TODO - method stub
+	//	TODO - method stub
 		return false;
 	}
+	
+	/**
+	 * 
+	 */
+	//public Set
 	
 	/**
 	 * 
