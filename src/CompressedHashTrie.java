@@ -120,6 +120,10 @@ public class CompressedHashTrie {
 			return val;
 		}
 
+		public void changeStr(String str) {
+			this.val = str;
+		}
+
 		@Override
 		public int hashCode() {
 			Character c = new Character(val.charAt(0));
@@ -216,17 +220,22 @@ public class CompressedHashTrie {
 			 */
 			//TODO - need to get away from using instanceof so much!
 			if (node instanceof TrieStrHash) {
-				
+				TrieStrHash strNode = (TrieStrHash) node;
+				//roundabout way of moving string down, but should be more efficient
+				strNode.val = strNode.val.substring(1); //change value of string
+
+				//this.root.put(new TrieCharHash(node.charAt(0), node.child, e);
 			} else {			
 				/* node instanceof TrieCharHash */
 			}
+
 			//node.child.insert(); //recursion
 		} else {
-			if (tempNode.getVal().length() > 1) {
-				/* insert full UNIQUE string into single trie hash node */
+			if (tempNode.val.length() > 1) {
+				/* insert full UNIQUE string into single trie hash node */ 
 				this.root.put(tempNode);
 				return true;
-			} else if (tempNode.getVal().length() == 1) {
+			} else if (tempNode.val.length() == 1) {
 				/* string is only one char, so insert just char hash node */
 				//TODO - is the overhead of these checks less than the overhead of just using
 				//		^strings?
