@@ -221,10 +221,14 @@ public class CompressedHashTrie {
 			//TODO - need to get away from using instanceof so much!
 			if (node instanceof TrieStrHash) {
 				TrieStrHash strNode = (TrieStrHash) node;
-				//roundabout way of moving string down, but should be more efficient
-				strNode.val = strNode.val.substring(1); //change value of string
-
-				//this.root.put(new TrieCharHash(node.charAt(0), node.child, e);
+				//roundabout way of moving string down a level, but should be more efficient
+				TrieCharHash tempCharNode = new TrieCharHash(strNode.val.charAt(0), node.child, e);
+				strNode.val = strNode.val.substring(1); //take away first char of string
+				node.child.put(strNode); //add edited string node to level below
+				this.root.remove(node); //remove string node from current level of trie
+				this.root.put(tempCharNode); //add char node into current level of trie
+				//TODO - At this point dont have to deal with children of string nodes, but keep in 
+				//^mind that this code does not deal with that
 			} else {			
 				/* node instanceof TrieCharHash */
 			}
