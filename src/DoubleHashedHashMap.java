@@ -118,6 +118,11 @@ public class DoubleHashedHashMap<K> {
 	
 	/*
 	 * Don't think we need to make a get method...
+	 * yes we do -MNM :D
+	 * its because we need to be able to return a TrieHashNode if the character already exists in 
+	 * ^the hash. Meaning that there is already that char and we need to move to the next node. To
+	 * ^move to the next node, we need to be able to move to the child of the TrieHashNode and,
+	 * ^thereby we need to return the K key if it exists so as to get that child node.
 	 */
 	public K get(K key) {
 		return null;

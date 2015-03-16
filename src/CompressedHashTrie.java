@@ -38,9 +38,49 @@ public class CompressedHashTrie {
 			this.eSet.add(e);
 		}
 
+		/**
+		 * Checks to see if first letter of val is equal
+		 *
+		 */
+		//TODO - IS THERE A BETTER WAY TO PERFORM THIS CHECK?!!!? seems pretty expensive...
+		//@SuppressWarnings("unchecked")
 		@Override
 		public boolean equals(Object o) {
-			return true;
+			//TrieHashNode that = (TrieHashNode) o;
+			if (this instanceof TrieStrHash) {
+				TrieStrHash _this = (TrieStrHash) this;
+				if (o instanceof TrieStrHash) {
+					TrieStrHash that = (TrieStrHash) o;
+					return _this.val.charAt(0) == that.val.charAt(0);
+				} else if (o instanceof TrieCharHash) {
+					TrieCharHash that = (TrieCharHash) o;
+					return _this.val.charAt(0) == that.val;
+				} else {
+					//dont care...
+					return false;
+				}
+			} else if (this instanceof TrieCharHash) {
+				TrieCharHash _this = (TrieCharHash) this;
+				if (o instanceof TrieStrHash) {
+					TrieStrHash that = (TrieStrHash) o;
+					return _this.val == that.val.charAt(0);
+				} else if (o instanceof TrieCharHash) {
+					TrieCharHash that = (TrieCharHash) o;
+					return _this.val == that.val;
+				} else {
+					//dont care...
+					return false;
+				}
+			} else {
+				//dont care...
+				return false;
+			}
+		}
+
+		//not ever used, but needed for polymorphism
+		@Override
+		public int hashCode() {
+			return this.hashCode();
 		}
 		
 	}
@@ -48,18 +88,18 @@ public class CompressedHashTrie {
 	/**
 	 *
 	 */
-	private class TrieStrNode extends TrieHashNode {
+	private class TrieStrHash extends TrieHashNode {
 		
 		/* String to be used in Trie. */
 		private String val;
 		
 		/**
-		 * Constructor for TrieStrNode
+		 * Constructor for TrieStrHash
 		 * @param val value of the character to be put in trie
 		 * @param child the next node in the trie
 		 * @param e reference to the entry from which being inserted
 		 */
-		private TrieStrNode(String val, DoubleHashedHashMap<TrieHashNode> 
+		private TrieStrHash(String val, DoubleHashedHashMap<TrieHashNode> 
 				child, Entry e) {
 			super(child, e);
 			this.val = val;
@@ -75,18 +115,18 @@ public class CompressedHashTrie {
 	/**
 	 *
 	 */
-	private final class TrieCharNode extends TrieHashNode {
+	private final class TrieCharHash extends TrieHashNode {
 		
 		/* Character to be used in Trie and hashed into TrieHashNode. */
 		private char val;
 		
 		/**
-		 * Constructor for TrieCharNode
+		 * Constructor for TrieCharHash
 		 * @param val value of the character to be put in trie
 		 * @param child the next node in the trie
 		 * @param e reference to the entry from which being inserted
 		 */
-		private TrieCharNode(char val, DoubleHashedHashMap<TrieHashNode> 
+		private TrieCharHash(char val, DoubleHashedHashMap<TrieHashNode> 
 				child, Entry e) {
 			super(child, e);
 			this.val = val;
@@ -134,15 +174,20 @@ public class CompressedHashTrie {
 		/* base case */
 		if (this.root == null) {
 			this.root = new DoubleHashedHashMap<TrieHashNode>();
-			this.root.put(new TrieStrNode(str, null, e));
+			this.root.put(new TrieStrHash(str, null, e));
 			return true;
 		}
 
 		//you know at least that none of the strings in the hash start with the same letter
 		//nor do they have any suffixes that are the same... (maybe)
 		//every bucket is hashed by a single character, but values can be chars or strings... :?
-		//^^--> SO, need to find a way to hash new entry and check value of first char in buckets if string
+		//^^--> SO, need to find a way to hash new entry and check value of first char in buckets
+ 		//		if string (SOLVED with Overrides equal() in TrieHashNode)
 
+		TrieStrHash in = new TrieStrHash(str, null, e);
+		if (this.root.containsKey(in)) {
+			;
+		}
 
 
 		return false;
@@ -150,8 +195,8 @@ public class CompressedHashTrie {
 	
 	/**
 	 * Removes string from trie, two different uses.
-	 * 	1) If string is non-unique or a prefix to another string, just remove id from ptr list.
-	 * 	2) If string is unique (i.e. no other ptrs in list), remove entire string from trie.
+	 * 	1) If string is non-unique or a prefix to another string, just remove id from ref list.
+	 * 	2) If string is unique (i.e. no other ref in list), remove entire string from trie.
 	 * ISSUES: need to search through Set of Entries to find one to delete (linear search is not 
 	 * 	efficient, others take up more space)
 	 * -maybe need a skip list structure...
@@ -186,7 +231,7 @@ public class CompressedHashTrie {
 	public static void main(String[] args) {
 		System.out.println("testing compressed hash trie...");
 		CompressedHashTrie trie = new CompressedHashTrie();
-		Entry e = new Entry("q1", 'q', 10, "hello, world this is this a test query?");
+		Entry e = new Entry("q1", 'q', 10, "hello, world is this a test query?");
 		trie.insert(e);
 	}
 }
