@@ -1,8 +1,3 @@
-//TODO - 'K' should be changed to 'T'
-//TODO - make initial capacity definable in constructor (want to make it small for Trie)
-
-import java.io.Serializable;
-
 /**
  * This is a generic Double Hashed Hash Map. It
  * takes a parameter K.
@@ -48,6 +43,23 @@ public class DoubleHashedHashMap<K> {
 		this.size = 0;
 		this.loadFactor = DEFAULT_LOAD_FACTOR;
 		this.initialCapacity = DEFAULT_INITIAL_CAPACITY;
+		this.makeHash(this.initialCapacity);
+	}
+	
+	/**
+	 * The constructor for the DoubleHashedHashMap that takes
+	 * in the capacity.
+	 * @param capacity the initial capacity
+	 */
+	public DoubleHashedHashMap(int capacity) {
+		this.size = 0;
+		
+		if (capacity < 0) {
+            throw new IllegalArgumentException();
+        }
+		
+		this.loadFactor = DEFAULT_LOAD_FACTOR;
+		this.initialCapacity = capacity;
 		this.makeHash(this.initialCapacity);
 	}
 	
@@ -116,18 +128,16 @@ public class DoubleHashedHashMap<K> {
 
 	}
 	
-	/*
-	 * Don't think we need to make a get method...
-	 * yes we do -MNM :D
-	 * its because we need to be able to return a TrieHashNode if the character already exists in 
-	 * ^the hash. Meaning that there is already that char and we need to move to the next node. To
-	 * ^move to the next node, we need to be able to move to the child of the TrieHashNode and,
-	 * ^thereby we need to return the K key if it exists so as to get that child node.
+	/**
+	 * This method returns the key if it exists in
+	 * the hash map, null otherwise.
+	 * @param key The key to search for.
+	 * @return The key, null otherwise.
 	 */
 	public K get(K key) {
 		int index = this.findIndex(key);
 		if (index != -1) {
-			return hashMap[index];
+			return this.hashMap[index];
 		}
 		return null;
 	}
@@ -157,7 +167,6 @@ public class DoubleHashedHashMap<K> {
 	 */
 	public boolean containsKey(K key) {
 		int index = this.findIndex(key);
-		System.out.println("Key: " + key + ". Index: " + index);
 		return !(index == -1);
 	}
 	
@@ -252,90 +261,6 @@ public class DoubleHashedHashMap<K> {
 				this.put(tempKey);
 			}
 		}
-	}
-	
-	/**
-	 * Object to test the map with.
-	 *
-	 */
-	public static class Node {
-		Node next;
-		int id;
-		
-		public Node() {
-			next = null;
-			id = 0;
-		}
-		
-		public Node(Node next, int id) {
-			this.next = next;
-			this.id = id;
-		}
-		
-		@Override
-		public String toString() {
-			if (next != null) {
-				return "id :" +id + ". Next: " + next.id;
-			}
-			return "id :" +id;
-		}
-		
-		@Override
-		public int hashCode(){
-			return id * 5 + 29 * 3 - 12;
-		}
-	}
-	
-	/**
-	 * This test shows that the hash map's objects can change without
-	 * explicitly changing them in the hash map.
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		DoubleHashedHashMap<Node> map = new DoubleHashedHashMap<>();
-		Node n1 = new Node();
-		Node n2 = new Node(n1, 10);
-		Node n3 = new Node();
-		n1.next = n3;
-		n1.id = 5;
-		map.put(n1);
-		map.put(n2);
-		map.put(n3);
-		
-		//Pointer Test
-		System.out.println(map.containsKey(n1));
-		System.out.println(map.containsKey(n2));
-		System.out.println(map.containsKey(n3));
-		n1.next = null;
-		System.out.println(map.containsKey(n1));
-		System.out.println(map.containsKey(n2));
-		System.out.println(map.containsKey(n3));
-		
-		Node[] array = new Node[50];
-		//Testing rehashing of map
-		for (int i = 0; i < 7; i++) {
-			Node tempNode = new Node();
-			tempNode.id = i + 1;
-			array[i] = tempNode;
-			if (i != 0) {
-				tempNode.next = array[i - 1];
-			}
-			map.put(tempNode);
-		}
-		
-		for (int i = 0; i < 7; i++) {
-			map.containsKey(array[i]);
-		}
-		
-		//testing remove method
-		for (int i = 0; i < 7; i+=2) {
-			map.remove(array[i]);
-		}
-		
-		for (int i = 0; i < 7; i++) {
-			map.containsKey(array[i]);
-		}
-		
 	}
 	
 }
