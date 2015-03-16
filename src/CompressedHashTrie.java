@@ -1,3 +1,9 @@
+/* NOTES
+ * -do all the checks to see if node is char or string justify the overhead if everything was a
+ * ^^string?
+ *
+ */
+
 /**
  * need to make a full write up on this
  * 
@@ -23,7 +29,7 @@ public class CompressedHashTrie {
 	//	TODO - make this list of references to entries
 	//	TODO - make this a skip list data structure (JEFF SAID WE DONT NEED THIS...?)
 		/* list of object references to unordered master Set */
-		protected Set<Entry> eSet;
+		protected Set<Entry> entries;
 		
 		/**
 		 * Determine if node is leaf or not.
@@ -35,7 +41,11 @@ public class CompressedHashTrie {
 
 		private TrieHashNode(DoubleHashedHashMap<TrieHashNode> child, Entry e) {
 			this.child = child;
-			this.eSet.add(e);
+			this.entries.add(e);
+		}
+
+		public void addEntry(Entry e) {
+			this.entries.add(e);
 		}
 
 		/**
@@ -43,6 +53,7 @@ public class CompressedHashTrie {
 		 *
 		 */
 		//TODO - IS THERE A BETTER WAY TO PERFORM THIS CHECK?!!!? seems pretty expensive...
+		//^^yes... make DoubleHashedHashMap not generic so it can deal with this directly...?
 		//@SuppressWarnings("unchecked")
 		@Override
 		public boolean equals(Object o) {
@@ -105,6 +116,10 @@ public class CompressedHashTrie {
 			this.val = val;
 		}
 
+		public String getVal() {
+			return val;
+		}
+
 		@Override
 		public int hashCode() {
 			Character c = new Character(val.charAt(0));
@@ -132,6 +147,10 @@ public class CompressedHashTrie {
 			this.val = val;
 		}
 		
+		public char getVal() {
+			return val;
+		}
+
 		@Override
 		public int hashCode() {
 			Character c = new Character(val);
@@ -154,7 +173,7 @@ public class CompressedHashTrie {
 	 */
 	public void insert(Entry e) {
 		//TODO - split at commas, punctuation marks, etc.
-		String words[] = e.getDataStr().split("//s+");
+		String words[] = e.getDataStr().toLowerCase().split("//s+");
 		
 		/* insert individual words into trie */
 		for (int i = 0; i < words.length; i++) {
@@ -167,7 +186,7 @@ public class CompressedHashTrie {
 	 * 
 	 * @param str the string to insert
 	 * @param e the entry that the string references
-	 * @return true if insert successful; false otherwise
+	 * @return true if insert updated trie; false if failed or string already in trie
 	 */
 	private boolean insert(String str, Entry e) {
 		
@@ -179,16 +198,47 @@ public class CompressedHashTrie {
 		}
 
 		//you know at least that none of the strings in the hash start with the same letter
-		//nor do they have any suffixes that are the same... (maybe)
+		//nor do they have any suffixes that are the same... (maybe) <-- NOT IMPLEMENTED
 		//every bucket is hashed by a single character, but values can be chars or strings... :?
 		//^^--> SO, need to find a way to hash new entry and check value of first char in buckets
  		//		if string (SOLVED with Overrides equal() in TrieHashNode)
 
-		TrieStrHash in = new TrieStrHash(str, null, e);
-		if (this.root.containsKey(in)) {
-			;
+		TrieStrHash tempNode = new TrieStrHash(str, null, e);
+		TrieHashNode node = this.root.get(tempNode);
+		/* check to see if already in hashmap */
+		if (node != null) {
+			/* char or first char in string in hash */
+			/* OPTIONS
+			 * 1) If node is a TrieStrHash, then need to break up string and move it down one level
+			 * ^also need to take away first char in string, then pass back to insert. (2 ops)
+			 * 2) If node is a TrieCharHash, then need to move down one level and take away first
+			 * ^char in string, then pass back to insert.
+			 */
+			//TODO - need to get away from using instanceof so much!
+			if (node instanceof TrieStrHash) {
+				
+			} else {			
+				/* node instanceof TrieCharHash */
+			}
+			//node.child.insert(); //recursion
+		} else {
+			if (tempNode.getVal().length() > 1) {
+				/* insert full UNIQUE string into single trie hash node */
+				this.root.put(tempNode);
+				return true;
+			} else if (tempNode.getVal().length() == 1) {
+				/* string is only one char, so insert just char hash node */
+				//TODO - is the overhead of these checks less than the overhead of just using
+				//		^strings?
+				//		^Maybe can make TrieStrHash convert itself to TrieCharHash when needed..?
+				this.root.put(new TrieCharHash(tempNode.val.charAt(0), tempNode.child, e));
+				return true;
+			} else {
+				/* end of string, therefore, string already in trie. Just add entry to Set */
+				node.addEntry(e);
+				return false;
+			}
 		}
-
 
 		return false;
 	}

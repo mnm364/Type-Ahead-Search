@@ -125,6 +125,10 @@ public class DoubleHashedHashMap<K> {
 	 * ^thereby we need to return the K key if it exists so as to get that child node.
 	 */
 	public K get(K key) {
+		int index = this.findIndex(key);
+		if (index != -1) {
+			return hashMap[index];
+		}
 		return null;
 	}
 	

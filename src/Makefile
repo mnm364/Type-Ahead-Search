@@ -1,6 +1,5 @@
 JFLAGS = -g -Xlint
 JC = javac
-
 .SUFFIXES: .java .class
 .java.class:
 	$(JC) $(JFLAGS) $*.java
