@@ -6,6 +6,7 @@ public class Set<T> {
 	private int size; //# of items in Set
 	private static final int START_SIZE = 5; 
 
+	@SuppressWarnings("unchecked")
 	public Set() {
 		theSet = (T[]) new Object[START_SIZE]; //declare array of type <T>, causes warning
 		size = 0;
@@ -33,6 +34,7 @@ public class Set<T> {
 	 * @param o the item to add
 	 * @return true if added, false otherwise (was duplicate)
 	*/
+	@SuppressWarnings("unchecked")
 	public final boolean add(final Object o) {
 		//doubles size of array if full
 		if (size == this.theSet.length) {
@@ -80,7 +82,7 @@ public class Set<T> {
 	public final Set<T> union(final Set<T> that) {
 		Set<T> union = new Set <T>();
 		Set<T> intersect = this.intersect(that);
-		Set<T> cross = (Set<T>) that;
+		Set<T> cross = that;
 
 		//copy "this" array into union to start
 		for (int i = 0; i < this.size; i++) {
@@ -106,7 +108,7 @@ public class Set<T> {
 		//store values of intersection
 		Set<T> intersect = new Set <T>();
 		//cast "that" to MyJHUSet<T>
-		Set<T> cross = (Set<T>) that;
+		Set<T> cross = that;
 
 		for (int i = 0; i < this.size(); i++) {
 			for (int j = 0; j < cross.size(); j++) {

@@ -218,6 +218,7 @@ public class DoubleHashedHashMap<K> {
 	 * This method creates the hash map.
 	 * @param capacity the capacity of the hash map
 	 */
+	@SuppressWarnings("unchecked")
 	private void makeHash(int capacity) {
 		this.hashMap = (K[]) new Object[capacity];
 	}
@@ -282,7 +283,7 @@ public class DoubleHashedHashMap<K> {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		DoubleHashedHashMap<Node> map = new DoubleHashedHashMap<Node>();
+		DoubleHashedHashMap<Node> map = new DoubleHashedHashMap<>();
 		Node n1 = new Node();
 		Node n2 = new Node(n1, 10);
 		Node n3 = new Node();
