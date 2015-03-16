@@ -1,6 +1,6 @@
 # Type Ahead Search
 
-Michael Miller, Jeffery Sham
+Michael Miller, Jeffrey Sham
 Quora Programming Challenge #1 - Type Ahead Search
 
 --------------------
