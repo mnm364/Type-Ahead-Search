@@ -43,11 +43,20 @@ public class CompressedHashTrie {
 		}
 
 		private TrieHashNode(CompressedHashTrie child, Entry e) {
+			if (this.entries == null) {
+				this.entries = new Set<Entry>();
+			}
+			
+			if (this.child == null) {
+				this.child = new CompressedHashTrie();
+			}
+			
 			if (child != null) {
-				System.out.println(child.toString());
+				//System.out.println(child.toString());
 				this.child = child;
 			}
-			System.out.println(e.toString());
+			//System.out.println(e.toString());
+			
 			if (e != null) {
 				this.entries.add(e);
 			}
@@ -247,7 +256,7 @@ public class CompressedHashTrie {
 			if (strNode.val.length() > 1) {
 				/* insert full UNIQUE string into single trie hash node */ 
 				this.root.put(strNode);
-				System.out.print(this.root.toString()); //testing
+				//System.out.print(this.root.toString()); //testing
 				return true;
 			} else if (strNode.val.length() == 1) {
 				/* string is only one char, so insert just char hash node */
@@ -261,7 +270,7 @@ public class CompressedHashTrie {
 			} else {
 				/* end of string, therefore, string already in trie. Just add entry to Set */
 				node.entries.add((Entry) strNode.entries.getVal(0));
-				System.out.print(this.root.toString()); //testing
+				//System.out.print(this.root.toString()); //testing
 				return false;
 			}
 		}

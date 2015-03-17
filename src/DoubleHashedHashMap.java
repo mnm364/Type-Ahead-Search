@@ -56,7 +56,7 @@ public class DoubleHashedHashMap<K> {
 	public DoubleHashedHashMap(int capacity) {
 		this.size = 0;
 		
-		if (capacity < 0) { //TODO - should this be < 1?
+		if (capacity < 1) { //TODO - should this be < 1?
             throw new IllegalArgumentException();
         }
 		
