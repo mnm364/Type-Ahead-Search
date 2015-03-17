@@ -61,4 +61,9 @@ public class Entry {
 	public String getDataStr() {
 		return dataStr;
 	}
+
+	@Override
+	public String toString() {
+		return "id:" + this.id + ";type:" + this.type + ";score:" + Float.toString(this.score) + ";dataStr:" + this.dataStr;
+	}
 }

@@ -1,8 +1,11 @@
 /* NOTES
  * -do all the checks to see if node is char or string justify the overhead if everything was a
  * ^^string?
- *
+ * -midstring compression is not implemented yet
+ * ^^b/c of this, inputting same string in twice will make the whole string single chars.. :(
  */
+
+//import java.util.Queue
 
 /**
  * need to make a full write up on this
@@ -24,7 +27,7 @@ public class CompressedHashTrie {
 		protected boolean leaf;
 		
 		/* Pointer to subsequent hash map. */
-		protected DoubleHashedHashMap<TrieHashNode> child;
+		protected CompressedHashTrie child;
 		
 	//	TODO - make this list of references to entries
 	//	TODO - make this a skip list data structure (JEFF SAID WE DONT NEED THIS...?)
@@ -39,9 +42,15 @@ public class CompressedHashTrie {
 			return leaf;
 		}
 
-		private TrieHashNode(DoubleHashedHashMap<TrieHashNode> child, Entry e) {
-			this.child = child;
-			this.entries.add(e);
+		private TrieHashNode(CompressedHashTrie child, Entry e) {
+			if (child != null) {
+				System.out.println(child.toString());
+				this.child = child;
+			}
+			System.out.println(e.toString());
+			if (e != null) {
+				this.entries.add(e);
+			}
 		}
 
 		public void addEntry(Entry e) {
@@ -110,8 +119,7 @@ public class CompressedHashTrie {
 		 * @param child the next node in the trie
 		 * @param e reference to the entry from which being inserted
 		 */
-		private TrieStrHash(String val, DoubleHashedHashMap<TrieHashNode> 
-				child, Entry e) {
+		private TrieStrHash(String val, CompressedHashTrie child, Entry e) {
 			super(child, e);
 			this.val = val;
 		}
@@ -145,8 +153,7 @@ public class CompressedHashTrie {
 		 * @param child the next node in the trie
 		 * @param e reference to the entry from which being inserted
 		 */
-		private TrieCharHash(char val, DoubleHashedHashMap<TrieHashNode> 
-				child, Entry e) {
+		private TrieCharHash(char val, CompressedHashTrie child, Entry e) {
 			super(child, e);
 			this.val = val;
 		}
@@ -165,8 +172,12 @@ public class CompressedHashTrie {
 	/**
 	 * Constructor for CompressedHashTrie
 	 */
-	public CompressedHashTrie() {
+	public CompressedHashTrie(DoubleHashedHashMap<TrieHashNode> root) {
+		this.root = root;
 		//TODO - stuff (copy constructor, etc...)
+	}
+	public CompressedHashTrie() {
+		this(null); //was NULL
 	}
 	
 	/**
@@ -181,7 +192,7 @@ public class CompressedHashTrie {
 		
 		/* insert individual words into trie */
 		for (int i = 0; i < words.length; i++) {
-			this.insert(words[i], e);
+			this.insert(new TrieStrHash(words[i], null, e));
 		}
 	}
 
@@ -192,12 +203,11 @@ public class CompressedHashTrie {
 	 * @param e the entry that the string references
 	 * @return true if insert updated trie; false if failed or string already in trie
 	 */
-	private boolean insert(String str, Entry e) {
-		
+	private boolean insert(TrieStrHash strNode) {
 		/* base case */
 		if (this.root == null) {
 			this.root = new DoubleHashedHashMap<TrieHashNode>();
-			this.root.put(new TrieStrHash(str, null, e));
+			this.root.put(strNode);
 			return true;
 		}
 
@@ -207,8 +217,7 @@ public class CompressedHashTrie {
 		//^^--> SO, need to find a way to hash new entry and check value of first char in buckets
  		//		if string (SOLVED with Overrides equal() in TrieHashNode)
 
-		TrieStrHash tempNode = new TrieStrHash(str, null, e);
-		TrieHashNode node = this.root.get(tempNode);
+		TrieHashNode node = this.root.get(strNode);
 		/* check to see if already in hashmap */
 		if (node != null) {
 			/* char or first char in string in hash */
@@ -220,35 +229,39 @@ public class CompressedHashTrie {
 			 */
 			//TODO - need to get away from using instanceof so much!
 			if (node instanceof TrieStrHash) {
-				TrieStrHash strNode = (TrieStrHash) node;
+				TrieStrHash tempStrNode = (TrieStrHash) node;
 				//roundabout way of moving string down a level, but should be more efficient
-				TrieCharHash tempCharNode = new TrieCharHash(strNode.val.charAt(0), node.child, e);
-				strNode.val = strNode.val.substring(1); //take away first char of string
-				node.child.put(strNode); //add edited string node to level below
+				TrieCharHash tempCharNode = new TrieCharHash(tempStrNode.val.charAt(0), node.child,
+					null);
+				tempCharNode.entries = node.entries; //copy over entries to char node
+				tempStrNode.val = tempStrNode.val.substring(1); //take away first char of string
+				node.child.insert(tempStrNode); //add edited string node to level below
 				this.root.remove(node); //remove string node from current level of trie
 				this.root.put(tempCharNode); //add char node into current level of trie
 				//TODO - At this point dont have to deal with children of string nodes, but keep in 
-				//^mind that this code does not deal with that
-			} else {			
-				/* node instanceof TrieCharHash */
+				//^mind that this code does not deal with that if implemented in future
 			}
-
-			//node.child.insert(); //recursion
+			strNode.val = strNode.val.substring(1);
+			node.child.insert(strNode); //recursion
 		} else {
-			if (tempNode.val.length() > 1) {
+			if (strNode.val.length() > 1) {
 				/* insert full UNIQUE string into single trie hash node */ 
-				this.root.put(tempNode);
+				this.root.put(strNode);
+				System.out.print(this.root.toString()); //testing
 				return true;
-			} else if (tempNode.val.length() == 1) {
+			} else if (strNode.val.length() == 1) {
 				/* string is only one char, so insert just char hash node */
 				//TODO - is the overhead of these checks less than the overhead of just using
 				//		^strings?
 				//		^Maybe can make TrieStrHash convert itself to TrieCharHash when needed..?
-				this.root.put(new TrieCharHash(tempNode.val.charAt(0), tempNode.child, e));
+				this.root.put(new TrieCharHash(strNode.val.charAt(0), strNode.child, 
+					(Entry) strNode.entries.getVal(0)));
+				System.out.print(this.root.toString()); //testing
 				return true;
 			} else {
 				/* end of string, therefore, string already in trie. Just add entry to Set */
-				node.addEntry(e);
+				node.entries.add((Entry) strNode.entries.getVal(0));
+				System.out.print(this.root.toString()); //testing
 				return false;
 			}
 		}
@@ -288,13 +301,32 @@ public class CompressedHashTrie {
 		return false;
 	}
 
+/*
+	private DoubleHashedHashMap<TrieHashNode> breadthFirstTraversal(CompressedHashTrie trie) {
+		//Breadth first traversal
+		Queue<DoubleHashedHashMap<TrieHashNode>> queue = new Queue<>();
+		for (int i = 0; i < trie.root.size(); i++) {
+			if (trie.root.) {
+				queue.add();
+			}
+		}
+	}
+*/
+	@Override
+	public String toString() {
+		return this.root.toString();
+	}
+
 	/**
 	 * Test driver main method
 	 */
 	public static void main(String[] args) {
 		System.out.println("testing compressed hash trie...");
 		CompressedHashTrie trie = new CompressedHashTrie();
-		Entry e = new Entry("q1", 'q', 10, "hello, world is this a test query?");
-		trie.insert(e);
+		String[] words = {"sap b","soda","bob","bp sap sap"};
+		for (int i = 0; i < 3; i++) {
+			Entry e = new Entry("e" + Integer.toString(i), 'b', 10, words[i]);
+			trie.insert(e);
+		}
 	}
 }

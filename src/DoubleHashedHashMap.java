@@ -1,3 +1,5 @@
+//TODO - make sure that hash size is always prime
+
 /**
  * This is a generic Double Hashed Hash Map. It
  * takes a parameter K.
@@ -54,7 +56,7 @@ public class DoubleHashedHashMap<K> {
 	public DoubleHashedHashMap(int capacity) {
 		this.size = 0;
 		
-		if (capacity < 0) {
+		if (capacity < 0) { //TODO - should this be < 1?
             throw new IllegalArgumentException();
         }
 		
@@ -261,6 +263,16 @@ public class DoubleHashedHashMap<K> {
 				this.put(tempKey);
 			}
 		}
+	}
+
+	//for TESTING
+	@Override
+	public String toString() {
+		String str = "";
+		for (int i = 0; i < size; i++) {
+			str += hashMap[i].toString();
+		}
+		return str;
 	}
 	
 }
