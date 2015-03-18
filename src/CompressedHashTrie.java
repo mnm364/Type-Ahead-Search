@@ -44,13 +44,8 @@ public class CompressedHashTrie {
 		}
 
 		private TrieHashNode(CompressedHashTrie child, Entry e) {
-			//if (child != null) {
-				//System.out.println(child.toString());
 			this.child = child;
-			//}
-			//System.out.println(e.toString());
 			this.entries.add(e);
-			//this.leaf = false;
 		}
 
 		public void addEntry(Entry e) {
@@ -202,12 +197,12 @@ public class CompressedHashTrie {
 	 */
 	public void insert(Entry e) {
 		//TODO - split at commas, punctuation marks, etc.
-		System.out.println("phrase - " + e.getDataStr().toLowerCase());
+		System.out.printf("- phrase: %s\n", e.getDataStr().toLowerCase());
 		String words[] = e.getDataStr().toLowerCase().split("\\s+");
 		
 		/* insert individual words into trie */
 		for (int i = 0; i < words.length; i++) {
-			System.out.println("insert word - " + words[i]);
+			System.out.printf("- insert word[%d]: %s\n", i, words[i]);
 			this.insert(new TrieStrHash(words[i], null, e));
 		}
 	}
@@ -224,7 +219,8 @@ public class CompressedHashTrie {
 		if (this.root.isEmpty()) {
 			this.root = new DoubleHashedHashMap<TrieHashNode>();
 			this.root.put(strNode);
-			System.out.println(this.root.toString()); //testing
+			System.out.printf("new level: %s\n", strNode);
+			System.out.printf("-->%s\n",this.root); //testing
 			return true;
 		}
 
@@ -234,9 +230,11 @@ public class CompressedHashTrie {
 		//^^--> SO, need to find a way to hash new entry and check value of first char in buckets
  		//		if string (SOLVED with Overrides equal() in TrieHashNode)
 
+		System.out.printf("search for: %s\n", strNode);
 		TrieHashNode node = this.root.get(strNode);
 		/* check to see if already in hashmap */
 		if (node != null) {
+			System.out.printf("return on search: %s\n", node);
 			/* char or first char in string in hash */
 			/* OPTIONS
 			 * 1) If node is a TrieStrHash, then need to break up string and move it down one level
@@ -252,36 +250,47 @@ public class CompressedHashTrie {
 				TrieStrHash tempStrNode = (TrieStrHash) node;
 				//roundabout way of moving string down a level, but should be more efficient
 				TrieCharHash tempCharNode = new TrieCharHash(tempStrNode.val.charAt(0), node.child,
-					null);
+					null); //TODO - giving me issues with "node.child"
 				tempCharNode.entries = node.entries; //copy over entries to char node
-				tempStrNode.val = tempStrNode.val.substring(1); //take away first char of string
-				node.child.insert(tempStrNode); //add edited string node to level below
+				System.out.printf("<%s\nremove attempt: %s \n",this.root, node);
 				this.root.remove(node); //remove string node from current level of trie
+				System.out.printf("-->%s\n",this.root);
+				tempStrNode.val = tempStrNode.val.substring(1); //take away first char of string
+				System.out.printf("inserting %s to child of %s\n", tempStrNode, tempCharNode);
+				tempCharNode.child.insert(tempStrNode); //add edited string node to level below
+				System.out.printf("putting char: %s\n", tempCharNode);
 				this.root.put(tempCharNode); //add char node into current level of trie
+				System.out.printf("-->%s\n", this.root);				
 				//TODO - At this point dont have to deal with children of string nodes, but keep in 
 				//^mind that this code does not deal with that if implemented in future
 			}
 			strNode.val = strNode.val.substring(1);
+			System.out.printf("curr level: %s\n", this.root);
 			node.child.insert(strNode); //recursion
 		} else {
+		System.out.printf("return on search: NULL\n");
 			if (strNode.val.length() > 1) {
 				/* insert full UNIQUE string into single trie hash node */ 
+				System.out.printf("<%s\n", this.root);
+				System.out.printf("putting: %s\n", strNode);
 				this.root.put(strNode);
-				System.out.println(this.root.toString()); //testing
+				System.out.printf("-->%s\n",this.root); //testing
 				return true;
 			} else if (strNode.val.length() == 1) {
 				/* string is only one char, so insert just char hash node */
 				//TODO - is the overhead of these checks less than the overhead of just using
 				//		^strings?
 				//		^Maybe can make TrieStrHash convert itself to TrieCharHash when needed..?
+				System.out.printf("<%s\n", this.root);
+				System.out.printf("putting: %s\n", strNode);
 				this.root.put(new TrieCharHash(strNode.val.charAt(0), strNode.child, 
-					(Entry) strNode.entries.getVal(0)));
-				System.out.println(this.root.toString()); //testing
+					(Entry) strNode.entries.getVal(0))); //questionable entry logic...?
+				System.out.printf("-->%s\n",this.root); //testing
 				return true;
 			} else {
 				/* end of string, therefore, string already in trie. Just add entry to Set */
 				node.entries.add((Entry) strNode.entries.getVal(0));
-				System.out.println(this.root.toString()); //testing
+				System.out.println(this.root); //testing
 				return false;
 			}
 		}
@@ -347,10 +356,10 @@ public class CompressedHashTrie {
 	public static void main(String[] args) {
 		System.out.println("testing compressed hash trie...");
 		CompressedHashTrie trie = new CompressedHashTrie();
-		String[] words = {"sap","b soda","bob","bp sap sap"};
-		for (int i = 0; i < 3; i++) {
+		String[] words = {"sap","b soda","bob","by sad sap"};
+		for (int i = 0; i < 4; i++) {
 			Entry e = new Entry("e" + Integer.toString(i), 'b', 10, words[i]);
-			System.out.println("insert #" + i);
+			System.out.printf("ENTRY #%d\n", i);
 			trie.insert(e);
 			//TrieStrHash strHash = new TrieStrHash("sap",null,e);
 			//trie.root.get(strHash).getEntries().toString();

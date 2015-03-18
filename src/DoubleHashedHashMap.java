@@ -118,9 +118,9 @@ public class DoubleHashedHashMap<K> implements Iterable<K> {
 			}
 			
 			double tempLoadFactor = (double) this.size / this.hashMap.length;
-			System.out.println("Temp Load Factor: " + tempLoadFactor);
+			//System.out.println("Temp Load Factor: " + tempLoadFactor);
 			if (tempLoadFactor >= this.loadFactor) {
-				System.out.println("Going to rehash");
+				//System.out.println("Going to rehash");
 				this.rehash();
 			}
 			
