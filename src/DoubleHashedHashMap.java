@@ -1,5 +1,7 @@
 //TODO - make sure that hash size is always prime
 
+import java.util.Iterator;
+import java.lang.Iterable;
 /**
  * This is a generic Double Hashed Hash Map. It
  * takes a parameter K.
@@ -8,7 +10,7 @@
  *
  * @param <K>
  */
-public class DoubleHashedHashMap<K> {
+public class DoubleHashedHashMap<K> implements Iterable<K> {
 	
 	/** The rehash multiplying factor.
 	 */
@@ -187,6 +189,13 @@ public class DoubleHashedHashMap<K> {
 	public int size(){
 		return this.size;
 	}
+
+	/**
+	 *
+	 */
+	public boolean isEmpty() {
+		return this.size == 0;
+	}
 	
 	/**
 	 * This method finds the index of the key.
@@ -268,11 +277,39 @@ public class DoubleHashedHashMap<K> {
 	//for TESTING
 	@Override
 	public String toString() {
-		String str = "";
-		for (int i = 0; i < size; i++) {
-			str += hashMap[i].toString();
+		String str = "[";
+		for (int i = 0; i < initialCapacity; i++) {
+			if (this.hashMap[i] != null) {
+				str += this.hashMap[i].toString() + ",";
+			}
 		}
+		str += "]";
 		return str;
 	}
-	
+
+	/**
+	 * Iterator Class.
+	 * issue: couldnt get anonymous class working...?
+	 */
+	public Iterator<K> iterator() {
+		return new HashIterator();
+	}
+
+	private class HashIterator implements Iterator<K> {
+		//return new Iterator<A> {
+		private int index = 0;
+		public boolean hasNext() {
+			while (hashMap[index] == null) {
+				index++;
+			}
+			return (index <= size);
+		}
+		public K next() {
+			return hashMap[index++];
+		}
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
+	}
+
 }

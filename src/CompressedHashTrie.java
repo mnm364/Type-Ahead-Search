@@ -5,7 +5,8 @@
  * ^^b/c of this, inputting same string in twice will make the whole string single chars.. :(
  */
 
-//import java.util.Queue
+import java.util.Queue;
+import java.util.LinkedList;
 
 /**
  * need to make a full write up on this
@@ -27,12 +28,12 @@ public class CompressedHashTrie {
 		protected boolean leaf;
 		
 		/* Pointer to subsequent hash map. */
-		protected CompressedHashTrie child;
+		protected CompressedHashTrie child = new CompressedHashTrie();
 		
 	//	TODO - make this list of references to entries
 	//	TODO - make this a skip list data structure (JEFF SAID WE DONT NEED THIS...?)
 		/* list of object references to unordered master Set */
-		protected Set<Entry> entries;
+		protected Set<Entry> entries = new Set<>();
 		
 		/**
 		 * Determine if node is leaf or not.
@@ -43,27 +44,21 @@ public class CompressedHashTrie {
 		}
 
 		private TrieHashNode(CompressedHashTrie child, Entry e) {
-			if (this.entries == null) {
-				this.entries = new Set<Entry>();
-			}
-			
-			if (this.child == null) {
-				this.child = new CompressedHashTrie();
-			}
-			
-			if (child != null) {
+			//if (child != null) {
 				//System.out.println(child.toString());
-				this.child = child;
-			}
+			this.child = child;
+			//}
 			//System.out.println(e.toString());
-			
-			if (e != null) {
-				this.entries.add(e);
-			}
+			this.entries.add(e);
+			//this.leaf = false;
 		}
 
 		public void addEntry(Entry e) {
 			this.entries.add(e);
+		}
+
+		public Set<Entry> getEntries() {
+			return entries;
 		}
 
 		/**
@@ -142,6 +137,11 @@ public class CompressedHashTrie {
 		}
 
 		@Override
+		public String toString() {
+			return "(" + this.val + ")";
+		}
+
+		@Override
 		public int hashCode() {
 			Character c = new Character(val.charAt(0));
 			return c.hashCode();
@@ -172,6 +172,11 @@ public class CompressedHashTrie {
 		}
 
 		@Override
+		public String toString() {
+			return "(" + this.val + ")";
+		}
+
+		@Override
 		public int hashCode() {
 			Character c = new Character(val);
 			return c.hashCode();
@@ -186,7 +191,7 @@ public class CompressedHashTrie {
 		//TODO - stuff (copy constructor, etc...)
 	}
 	public CompressedHashTrie() {
-		this(null); //was NULL
+		this(new DoubleHashedHashMap<TrieHashNode>()); //was NULL
 	}
 	
 	/**
@@ -197,10 +202,12 @@ public class CompressedHashTrie {
 	 */
 	public void insert(Entry e) {
 		//TODO - split at commas, punctuation marks, etc.
-		String words[] = e.getDataStr().toLowerCase().split("//s+");
+		System.out.println("phrase - " + e.getDataStr().toLowerCase());
+		String words[] = e.getDataStr().toLowerCase().split("\\s+");
 		
 		/* insert individual words into trie */
 		for (int i = 0; i < words.length; i++) {
+			System.out.println("insert word - " + words[i]);
 			this.insert(new TrieStrHash(words[i], null, e));
 		}
 	}
@@ -214,9 +221,10 @@ public class CompressedHashTrie {
 	 */
 	private boolean insert(TrieStrHash strNode) {
 		/* base case */
-		if (this.root == null) {
+		if (this.root.isEmpty()) {
 			this.root = new DoubleHashedHashMap<TrieHashNode>();
 			this.root.put(strNode);
+			System.out.println(this.root.toString()); //testing
 			return true;
 		}
 
@@ -237,6 +245,9 @@ public class CompressedHashTrie {
 			 * ^char in string, then pass back to insert.
 			 */
 			//TODO - need to get away from using instanceof so much!
+			if (node.child == null){
+				node.child = new CompressedHashTrie();
+			}
 			if (node instanceof TrieStrHash) {
 				TrieStrHash tempStrNode = (TrieStrHash) node;
 				//roundabout way of moving string down a level, but should be more efficient
@@ -256,7 +267,7 @@ public class CompressedHashTrie {
 			if (strNode.val.length() > 1) {
 				/* insert full UNIQUE string into single trie hash node */ 
 				this.root.put(strNode);
-				//System.out.print(this.root.toString()); //testing
+				System.out.println(this.root.toString()); //testing
 				return true;
 			} else if (strNode.val.length() == 1) {
 				/* string is only one char, so insert just char hash node */
@@ -265,12 +276,12 @@ public class CompressedHashTrie {
 				//		^Maybe can make TrieStrHash convert itself to TrieCharHash when needed..?
 				this.root.put(new TrieCharHash(strNode.val.charAt(0), strNode.child, 
 					(Entry) strNode.entries.getVal(0)));
-				System.out.print(this.root.toString()); //testing
+				System.out.println(this.root.toString()); //testing
 				return true;
 			} else {
 				/* end of string, therefore, string already in trie. Just add entry to Set */
 				node.entries.add((Entry) strNode.entries.getVal(0));
-				//System.out.print(this.root.toString()); //testing
+				System.out.println(this.root.toString()); //testing
 				return false;
 			}
 		}
@@ -310,32 +321,40 @@ public class CompressedHashTrie {
 		return false;
 	}
 
-/*
-	private DoubleHashedHashMap<TrieHashNode> breadthFirstTraversal(CompressedHashTrie trie) {
+/* work in progress...
+	private CompressedHashTrie breadthFirstTraversal(CompressedHashTrie trie) {
 		//Breadth first traversal
-		Queue<DoubleHashedHashMap<TrieHashNode>> queue = new Queue<>();
-		for (int i = 0; i < trie.root.size(); i++) {
-			if (trie.root.) {
-				queue.add();
-			}
+		if (trie == null) {
+			return 
+		}
+		Queue<TrieHashNode> queue = new LinkedList<>();
+		for (int i = 0; trie.root.iterator().hasNext(); i++) {
+			queue.add(trie.root.iterator().next());
+		}
+		while (queue.peek() != null) {
+			breadthFirstTraversal(queue.remove().child);
 		}
 	}
-*/
+
 	@Override
 	public String toString() {
 		return this.root.toString();
 	}
-
+*/
 	/**
 	 * Test driver main method
 	 */
 	public static void main(String[] args) {
 		System.out.println("testing compressed hash trie...");
 		CompressedHashTrie trie = new CompressedHashTrie();
-		String[] words = {"sap b","soda","bob","bp sap sap"};
+		String[] words = {"sap","b soda","bob","bp sap sap"};
 		for (int i = 0; i < 3; i++) {
 			Entry e = new Entry("e" + Integer.toString(i), 'b', 10, words[i]);
+			System.out.println("insert #" + i);
 			trie.insert(e);
+			//TrieStrHash strHash = new TrieStrHash("sap",null,e);
+			//trie.root.get(strHash).getEntries().toString();
+			//trie.root.toString();
 		}
 	}
 }
