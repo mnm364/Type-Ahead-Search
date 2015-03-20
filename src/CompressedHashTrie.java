@@ -274,12 +274,32 @@ public class CompressedHashTrie {
 				//TODO - At this point dont have to deal with children of string nodes, but keep in 
 				//^mind that this code does not deal with that if implemented in future
 			}
-			strNode.val = strNode.val.substring(1);
-			System.out.printf("curr level: %s\n", this.root);
-			System.out.printf("recurse with %s\n", strNode);
-			System.out.printf("Child of %s --> %s\n", got, got.child.root);
-			got.child.insert(strNode); //recursion
-			System.out.printf("Child of %s --> %s\n", got, got.child.root);
+			
+			
+			//3/20/15 ADDED a check for the length of the string because it was throwing an error before 
+			
+			if (strNode.val.length() > 1) {
+				strNode.val = strNode.val.substring(1);
+				System.out.printf("curr level: %s\n", this.root);
+				System.out.printf("recurse with %s\n", strNode);
+				System.out.printf("Child of %s --> %s\n", got, got.child.root);
+				got.child.insert(strNode); //recursion
+				System.out.printf("Child of %s --> %s\n", got, got.child.root);
+			} else if (strNode.val.length() == 1) {
+					/* string is only one char, so insert just char hash got */
+					//TODO - is the overhead of these checks less than the overhead of just using
+					//		^strings?
+					//		^Maybe can make TrieStrHash convert itself to TrieCharHash when needed..?
+					System.out.printf("<%s\n", this.root);
+					System.out.printf("putting {CHAR}: %s\n", strNode);
+					this.root.put(new TrieCharHash(strNode.val.charAt(0), strNode.child, 
+						(Entry) strNode.entries.getVal(0))); //questionable entry logic...?
+					System.out.printf("-->%s\n",this.root); //testing
+					return true;
+				
+			}
+			
+			
 
 		} else {
 			System.out.printf("return on search: NULL\n");
