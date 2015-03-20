@@ -1,5 +1,5 @@
 /* NOTES
- * -do all the checks to see if node is char or string justify the overhead if everything was a
+ * -do all the checks to see if got is char or string justify the overhead if everything was a
  * ^^string?
  * -midstring compression is not implemented yet
  * ^^b/c of this, inputting same string in twice will make the whole string single chars.. :(
@@ -36,7 +36,7 @@ public class CompressedHashTrie {
 		protected Set<Entry> entries = new Set<>();
 		
 		/**
-		 * Determine if node is leaf or not.
+		 * Determine if got is leaf or not.
 		 * @return true if leaf; false otherwise
 		 */
 		private boolean isLeaf() {
@@ -115,12 +115,16 @@ public class CompressedHashTrie {
 		/**
 		 * Constructor for TrieStrHash
 		 * @param val value of the character to be put in trie
-		 * @param child the next node in the trie
+		 * @param child the next got in the trie
 		 * @param e reference to the entry from which being inserted
 		 */
 		private TrieStrHash(String val, CompressedHashTrie child, Entry e) {
 			super(child, e);
 			this.val = val;
+		}
+
+		public void setChildNull() {
+			this.child = null;
 		}
 
 		public String getVal() {
@@ -154,7 +158,7 @@ public class CompressedHashTrie {
 		/**
 		 * Constructor for TrieCharHash
 		 * @param val value of the character to be put in trie
-		 * @param child the next node in the trie
+		 * @param child the next got in the trie
 		 * @param e reference to the entry from which being inserted
 		 */
 		private TrieCharHash(char val, CompressedHashTrie child, Entry e) {
@@ -215,14 +219,14 @@ public class CompressedHashTrie {
 	 * @return true if insert updated trie; false if failed or string already in trie
 	 */
 	private boolean insert(TrieStrHash strNode) {
-		/* base case */
+		/* base case
 		if (this.root.isEmpty()) {
 			this.root = new DoubleHashedHashMap<TrieHashNode>();
 			this.root.put(strNode);
 			System.out.printf("new level: %s\n", strNode);
 			System.out.printf("-->%s\n",this.root); //testing
 			return true;
-		}
+		}*/
 
 		//you know at least that none of the strings in the hash start with the same letter
 		//nor do they have any suffixes that are the same... (maybe) <-- NOT IMPLEMENTED
@@ -231,65 +235,75 @@ public class CompressedHashTrie {
  		//		if string (SOLVED with Overrides equal() in TrieHashNode)
 
 		System.out.printf("search for: %s\n", strNode);
-		TrieHashNode node = this.root.get(strNode);
+		TrieHashNode got = this.root.get(strNode);
 		/* check to see if already in hashmap */
-		if (node != null) {
-			System.out.printf("return on search: %s\n", node);
+		if (got != null) {
+			System.out.printf("return on search: %s\n", got);
 			/* char or first char in string in hash */
 			/* OPTIONS
-			 * 1) If node is a TrieStrHash, then need to break up string and move it down one level
+			 * 1) If got is a TrieStrHash, then need to break up string and move it down one level
 			 * ^also need to take away first char in string, then pass back to insert. (2 ops)
-			 * 2) If node is a TrieCharHash, then need to move down one level and take away first
+			 * 2) If got is a TrieCharHash, then need to move down one level and take away first
 			 * ^char in string, then pass back to insert.
 			 */
 			//TODO - need to get away from using instanceof so much!
-			if (node.child == null){
-				node.child = new CompressedHashTrie();
+			if (got.child == null){
+				//System.out.printf("child of %s --> NEW\n", got);
+				got.child = new CompressedHashTrie();
+			} else {
+				//System.out.printf("child of %s --> %s\n", got, got.child.root);
 			}
-			if (node instanceof TrieStrHash) {
-				TrieStrHash tempStrNode = (TrieStrHash) node;
+			if (got instanceof TrieStrHash) {
+				TrieStrHash tempStrNode = (TrieStrHash) got;
+				
 				//roundabout way of moving string down a level, but should be more efficient
-				TrieCharHash tempCharNode = new TrieCharHash(tempStrNode.val.charAt(0), node.child,
-					null); //TODO - giving me issues with "node.child"
-				tempCharNode.entries = node.entries; //copy over entries to char node
-				System.out.printf("<%s\nremove attempt: %s \n",this.root, node);
-				this.root.remove(node); //remove string node from current level of trie
+				TrieCharHash tempCharNode = new TrieCharHash(tempStrNode.val.charAt(0), got.child,
+					null); //TODO - giving me issues with "got.child"
+				System.out.printf("child of %s --> %s\n", tempCharNode, tempCharNode.child.root);
+				tempCharNode.entries = got.entries; //copy over entries to char got
+				System.out.printf("<%s\nremove attempt: %s \n",this.root, got);
+				this.root.remove(got); //remove string got from current level of trie
 				System.out.printf("-->%s\n",this.root);
 				tempStrNode.val = tempStrNode.val.substring(1); //take away first char of string
 				System.out.printf("inserting %s to child of %s\n", tempStrNode, tempCharNode);
-				tempCharNode.child.insert(tempStrNode); //add edited string node to level below
+				tempCharNode.child.insert(tempStrNode); //add edited string got to level below
+				System.out.printf("child of %s --> %s\n", tempCharNode, tempCharNode.child.root);
 				System.out.printf("putting char: %s\n", tempCharNode);
-				this.root.put(tempCharNode); //add char node into current level of trie
+				this.root.put(tempCharNode); //add char got into current level of trie
 				System.out.printf("-->%s\n", this.root);				
 				//TODO - At this point dont have to deal with children of string nodes, but keep in 
 				//^mind that this code does not deal with that if implemented in future
 			}
 			strNode.val = strNode.val.substring(1);
 			System.out.printf("curr level: %s\n", this.root);
-			node.child.insert(strNode); //recursion
+			System.out.printf("recurse with %s\n", strNode);
+			System.out.printf("Child of %s --> %s\n", got, got.child.root);
+			got.child.insert(strNode); //recursion
+			System.out.printf("Child of %s --> %s\n", got, got.child.root);
+
 		} else {
-		System.out.printf("return on search: NULL\n");
+			System.out.printf("return on search: NULL\n");
 			if (strNode.val.length() > 1) {
-				/* insert full UNIQUE string into single trie hash node */ 
+				/* insert full UNIQUE string into single trie hash got */ 
 				System.out.printf("<%s\n", this.root);
-				System.out.printf("putting: %s\n", strNode);
+				System.out.printf("putting {STR}: %s\n", strNode);
 				this.root.put(strNode);
 				System.out.printf("-->%s\n",this.root); //testing
 				return true;
 			} else if (strNode.val.length() == 1) {
-				/* string is only one char, so insert just char hash node */
+				/* string is only one char, so insert just char hash got */
 				//TODO - is the overhead of these checks less than the overhead of just using
 				//		^strings?
 				//		^Maybe can make TrieStrHash convert itself to TrieCharHash when needed..?
 				System.out.printf("<%s\n", this.root);
-				System.out.printf("putting: %s\n", strNode);
+				System.out.printf("putting {CHAR}: %s\n", strNode);
 				this.root.put(new TrieCharHash(strNode.val.charAt(0), strNode.child, 
 					(Entry) strNode.entries.getVal(0))); //questionable entry logic...?
 				System.out.printf("-->%s\n",this.root); //testing
 				return true;
 			} else {
 				/* end of string, therefore, string already in trie. Just add entry to Set */
-				node.entries.add((Entry) strNode.entries.getVal(0));
+				got.entries.add((Entry) strNode.entries.getVal(0));
 				System.out.println(this.root); //testing
 				return false;
 			}
