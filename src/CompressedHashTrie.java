@@ -207,10 +207,44 @@ public class CompressedHashTrie {
 		/* insert individual words into trie */
 		for (int i = 0; i < words.length; i++) {
 			System.out.printf("- insert word[%d]: %s\n", i, words[i]);
-			this.insert(new TrieStrHash(words[i], null, e));
+			this.insert2(new TrieStrHash(words[i], null, e));
 		}
 	}
 
+	private boolean insert2(TrieStrHash strNode) {
+		boolean putSuccess = this.root.put(strNode);
+		
+		if (!putSuccess) {
+			//The first letter of strNode is already in the hash map
+			TrieHashNode tempNode = this.root.get(strNode);
+			
+			if (tempNode.child == null) {
+				tempNode.child = new CompressedHashTrie();
+			}
+			
+			if (tempNode instanceof TrieStrHash) {
+				TrieStrHash tempStrHash = (TrieStrHash) tempNode;
+				String value = tempStrHash.getVal();
+				tempStrHash.changeStr(value.charAt(0) + "");
+				
+				if (value.length() > 1) {
+					TrieStrHash tempStrHashShorter = new TrieStrHash(value.substring(1), null, null);
+					tempStrHashShorter.entries = tempStrHash.entries;
+					tempStrHash.child.insert2(tempStrHashShorter);
+				}
+				
+				if (strNode.getVal().length() > 1) {
+					strNode.changeStr(strNode.getVal().substring(1));
+					tempStrHash.child.insert2(strNode);
+				}
+
+			}
+		}
+		
+		return false;
+	}
+	
+	
 	/**
 	 * Inserts a single string into the trie.
 	 * 
@@ -254,6 +288,7 @@ public class CompressedHashTrie {
 				//System.out.printf("child of %s --> %s\n", got, got.child.root);
 			}
 			if (got instanceof TrieStrHash) {
+				
 				TrieStrHash tempStrNode = (TrieStrHash) got;
 				
 				//roundabout way of moving string down a level, but should be more efficient
@@ -270,13 +305,11 @@ public class CompressedHashTrie {
 				System.out.printf("child of %s --> %s\n", tempCharNode, tempCharNode.child.root);
 				System.out.printf("putting char: %s\n", tempCharNode);
 				this.root.put(tempCharNode); //add char got into current level of trie
-				System.out.printf("-->%s\n", this.root);				
+				System.out.printf("-->%s\n", this.root);	
+
 				//TODO - At this point dont have to deal with children of string nodes, but keep in 
 				//^mind that this code does not deal with that if implemented in future
 			}
-			
-			
-			//3/20/15 ADDED a check for the length of the string because it was throwing an error before 
 			
 			if (strNode.val.length() > 1) {
 				strNode.val = strNode.val.substring(1);
@@ -285,21 +318,7 @@ public class CompressedHashTrie {
 				System.out.printf("Child of %s --> %s\n", got, got.child.root);
 				got.child.insert(strNode); //recursion
 				System.out.printf("Child of %s --> %s\n", got, got.child.root);
-			} else if (strNode.val.length() == 1) {
-					/* string is only one char, so insert just char hash got */
-					//TODO - is the overhead of these checks less than the overhead of just using
-					//		^strings?
-					//		^Maybe can make TrieStrHash convert itself to TrieCharHash when needed..?
-					System.out.printf("<%s\n", this.root);
-					System.out.printf("putting {CHAR}: %s\n", strNode);
-					this.root.put(new TrieCharHash(strNode.val.charAt(0), strNode.child, 
-						(Entry) strNode.entries.getVal(0))); //questionable entry logic...?
-					System.out.printf("-->%s\n",this.root); //testing
-					return true;
-				
 			}
-			
-			
 
 		} else {
 			System.out.printf("return on search: NULL\n");
@@ -378,12 +397,12 @@ public class CompressedHashTrie {
 			breadthFirstTraversal(queue.remove().child);
 		}
 	}
-
+*/
 	@Override
 	public String toString() {
 		return this.root.toString();
 	}
-*/
+
 	/**
 	 * Test driver main method
 	 */
@@ -399,5 +418,6 @@ public class CompressedHashTrie {
 			//trie.root.get(strHash).getEntries().toString();
 			//trie.root.toString();
 		}
+		System.out.println(trie);
 	}
 }
