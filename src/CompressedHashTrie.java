@@ -259,6 +259,7 @@ public class CompressedHashTrie {
 				//roundabout way of moving string down a level, but should be more efficient
 				TrieCharHash tempCharNode = new TrieCharHash(tempStrNode.val.charAt(0), got.child,
 					null); //TODO - giving me issues with "got.child"
+				tempStrNode.child = new CompressedHashTrie();
 				System.out.printf("child of %s --> %s\n", tempCharNode, tempCharNode.child.root);
 				tempCharNode.entries = got.entries; //copy over entries to char got
 				System.out.printf("<%s\nremove attempt: %s \n",this.root, got);
