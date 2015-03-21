@@ -39,7 +39,7 @@ public class CompressedHashTrie {
 		 * Determine if got is leaf or not.
 		 * @return true if leaf; false otherwise
 		 */
-		private boolean isLeaf() {
+		protected boolean isLeaf() {
 			return leaf;
 		}
 
@@ -48,12 +48,16 @@ public class CompressedHashTrie {
 			this.entries.add(e);
 		}
 
-		public void addEntry(Entry e) {
+		protected void addEntry(Entry e) {
 			this.entries.add(e);
 		}
 
-		public Set<Entry> getEntries() {
+		protected Set<Entry> getEntries() {
 			return entries;
+		}
+
+		protected Entry getFirstEntry() {
+			return (Entry) entries.getVal(0);
 		}
 
 		/**
@@ -62,7 +66,6 @@ public class CompressedHashTrie {
 		 */
 		//TODO - IS THERE A BETTER WAY TO PERFORM THIS CHECK?!!!? seems pretty expensive...
 		//^^yes... make DoubleHashedHashMap not generic so it can deal with this directly...?
-		//@SuppressWarnings("unchecked")
 		@Override
 		public boolean equals(Object o) {
 			//TrieHashNode that = (TrieHashNode) o;
@@ -123,21 +126,21 @@ public class CompressedHashTrie {
 			this.val = val;
 		}
 
-		public void setChildNull() {
+		private void setChildNull() {
 			this.child = null;
 		}
 
-		public String getVal() {
+		private String getVal() {
 			return val;
 		}
 
-		public void changeStr(String str) {
+		private void changeStr(String str) {
 			this.val = str;
 		}
 
 		@Override
 		public String toString() {
-			return "(" + this.val + ")";
+			return "(" + this.val + ":" + entries + ")";
 		}
 
 		@Override
@@ -166,7 +169,7 @@ public class CompressedHashTrie {
 			this.val = val;
 		}
 		
-		public char getVal() {
+		private char getVal() {
 			return val;
 		}
 
@@ -201,12 +204,11 @@ public class CompressedHashTrie {
 	 */
 	public void insert(Entry e) {
 		//TODO - split at commas, punctuation marks, etc.
-		System.out.printf("- phrase: %s\n", e.getDataStr().toLowerCase());
 		String words[] = e.getDataStr().toLowerCase().split("\\s+");
 		
 		/* insert individual words into trie */
 		for (int i = 0; i < words.length; i++) {
-			System.out.printf("- insert word[%d]: %s\n", i, words[i]);
+			System.out.printf("- insert %s:{%s}\n", words[i],e);
 			this.insert2(new TrieStrHash(words[i], null, e));
 		}
 	}
@@ -217,7 +219,7 @@ public class CompressedHashTrie {
 		if (!putSuccess) {
 			//The first letter of strNode is already in the hash map
 			TrieHashNode tempNode = this.root.get(strNode);
-			
+
 			if (tempNode.child == null) {
 				tempNode.child = new CompressedHashTrie();
 			}
@@ -230,7 +232,8 @@ public class CompressedHashTrie {
 				if (value.length() > 1) {
 					TrieStrHash tempStrHashShorter = new TrieStrHash(value.substring(1), null, null);
 					tempStrHashShorter.entries = tempStrHash.entries;
-					tempStrHash.child.insert2(tempStrHashShorter);
+					//tempStrHash.addEntry(strNode.getFirstEntry()); //update entry list
+					tempStrHash.child.insert2(tempStrHashShorter);	
 				}
 				
 				if (strNode.getVal().length() > 1) {
@@ -238,7 +241,10 @@ public class CompressedHashTrie {
 					tempStrHash.child.insert2(strNode);
 				}
 
+				System.out.printf("%s\n%s --> %s\n", this.root, tempStrHash, tempStrHash.child.root);
 			}
+		} else {
+			System.out.printf("%s\n", this.root); //for testing
 		}
 		
 		return false;

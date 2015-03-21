@@ -64,6 +64,7 @@ public class Entry {
 
 	@Override
 	public String toString() {
-		return "id:" + this.id + ";type:" + this.type + ";score:" + Float.toString(this.score) + ";dataStr:" + this.dataStr;
+		return this.id; //for testing
+		//return "id:" + this.id + ";type:" + this.type + ";score:" + Float.toString(this.score) + ";dataStr:" + this.dataStr;
 	}
 }
