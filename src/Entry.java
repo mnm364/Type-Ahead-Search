@@ -67,4 +67,16 @@ public class Entry {
 		return this.id; //for testing
 		//return "id:" + this.id + ";type:" + this.type + ";score:" + Float.toString(this.score) + ";dataStr:" + this.dataStr;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof Entry) {
+			Entry theObject = (Entry) o;
+			return this.id.equals(theObject.id);
+		} else if (o instanceof String) {
+			String theObject = (String) o;
+			return this.id.equals(theObject);
+		}
+		return false;
+	}
 }

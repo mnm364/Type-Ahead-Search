@@ -215,7 +215,7 @@ public class CompressedHashTrie {
 	
 	/**
 	 * This method inserts a new TrieStrHash object into the CompressedHashTrie.
-	 * It also correctly keeps track of the entries that are in the root node.
+	 * It also almost correctly keeps track of the entries that are in the root node.
 	 * It converts the TrieStrHash to a TrieCharHash if there are duplicate letters
 	 * in the hash map.
 	 * @param strNode The TrieHashNode to insert
@@ -438,8 +438,65 @@ public class CompressedHashTrie {
 	 * @param id the id associated with the str
 	 * @return true if removed string; false otherwise
 	 */
-	public boolean remove(String str, float id) {
+	public boolean remove(String str, String id) {
 	//	TODO - method stub
+		String words[] = str.toLowerCase().split("\\s+");
+		
+		for (int i = 0; i < words.length; i++) {
+			TrieHashNode tempNode = this.root.get(new TrieStrHash(words[i], null, null));
+			if (tempNode != null) {
+				this.remove(tempNode, words[i], id);
+			}
+		}
+		return false;
+	}
+	
+	private boolean remove(TrieHashNode tempNode, String str, String id) {
+		
+		if (tempNode instanceof TrieStrHash) {
+			TrieStrHash tempStrNode = (TrieStrHash) tempNode;
+			Set<Entry> entries = tempStrNode.entries;
+			
+			if (entries.size() > 1) {
+				if (tempStrNode.child != null && str.length() > 1) {
+					String value = tempStrNode.getVal();
+					str = str.substring(str.indexOf(value.charAt(value.length()-1)));
+					
+					TrieHashNode tempHashNode = tempStrNode.child.root.get(new TrieStrHash(str, null, null));
+					if (tempHashNode != null) {
+						if (tempHashNode.entries.size() == 1) {
+							tempStrNode.child.root.remove(tempHashNode);
+						}
+						this.remove(tempHashNode, str, id);
+					}
+				}
+			}
+			entries.remove(id);
+
+		} else {
+			TrieCharHash tempCharNode = (TrieCharHash) tempNode;
+			
+			Set<Entry> entries = tempCharNode.entries;
+			
+			if (entries.size() > 1) {
+				if (str.length() > 1) {
+					str = str.substring(1);
+				}
+				
+				if (tempCharNode.child != null) {
+					TrieHashNode tempHashNode = tempCharNode.child.root.get(new TrieStrHash(str, null, null));
+					if (tempHashNode != null) {
+						if (tempHashNode.entries.size() == 1) {
+							tempCharNode.child.root.remove(tempHashNode);
+						}
+						this.remove(tempHashNode, str, id);
+					}
+				}
+			}
+			entries.remove(id);
+
+		}
+
 		return false;
 	}
 	
@@ -480,7 +537,7 @@ public class CompressedHashTrie {
 
 	/**
 	 * Test driver main method
-	 */
+	 */ 
 	public static void main(String[] args) {
 		System.out.println("testing compressed hash trie...");
 		CompressedHashTrie trie = new CompressedHashTrie();
@@ -494,5 +551,6 @@ public class CompressedHashTrie {
 			//trie.root.toString();
 		}
 		System.out.println(trie);
+		trie.remove("by sad sap", "e3");
 	}
 }
