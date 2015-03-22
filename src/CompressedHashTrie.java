@@ -249,10 +249,10 @@ public class CompressedHashTrie {
 					tempCharHash.addEntry((Entry)entries.getVal(i));
 				}
 				
+				
 				if (value.length() > 1) {
 					TrieStrHash tempStrHashShorter = new TrieStrHash(value.substring(1), null, null);
 					tempStrHashShorter.entries = tempCharHash.entries;
-					//tempStrHash.addEntry(strNode.getFirstEntry()); //update entry list
 					tempCharHash.child.insert3(tempStrHashShorter);	
 				}
 				
@@ -260,6 +260,7 @@ public class CompressedHashTrie {
 					newStrNode.changeStr(newStrNode.getVal().substring(1));
 					tempCharHash.child.insert3(newStrNode);
 				}
+				System.out.printf("%s\n%s --> %s\n", this.root, tempStrHash, tempStrHash.child.root);
 
 			} else if(tempNode instanceof TrieCharHash && strNode instanceof TrieStrHash) {
 				TrieCharHash tempCharHash = (TrieCharHash) tempNode;
@@ -275,7 +276,11 @@ public class CompressedHashTrie {
 					newStrNode.changeStr(newStrNode.getVal().substring(1));
 					tempCharHash.child.insert3(newStrNode);
 				}
+				System.out.printf("%s\n%s --> %s\n", this.root, tempCharHash, tempCharHash.child.root);
+
 			}
+		} else {
+			System.out.printf("%s\n", this.root); //for testing
 		}
 		
 		return true;
