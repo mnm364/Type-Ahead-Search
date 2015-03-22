@@ -209,8 +209,76 @@ public class CompressedHashTrie {
 		/* insert individual words into trie */
 		for (int i = 0; i < words.length; i++) {
 			System.out.printf("- insert %s:{%s}\n", words[i],e);
-			this.insert2(new TrieStrHash(words[i], null, e));
+			this.insert3(new TrieStrHash(words[i], null, e));
 		}
+	}
+	
+	/**
+	 * This method inserts a new TrieStrHash object into the CompressedHashTrie.
+	 * It also correctly keeps track of the entries that are in the root node.
+	 * It converts the TrieStrHash to a TrieCharHash if there are duplicate letters
+	 * in the hash map.
+	 * @param strNode The TrieHashNode to insert
+	 * @return true
+	 */
+	private boolean insert3(TrieHashNode strNode) {
+		boolean putSuccess = this.root.put(strNode);
+		
+		if (!putSuccess) {
+			//The first letter of strNode is already in the hash map
+			TrieHashNode tempNode = this.root.get(strNode);
+
+			if (tempNode.child == null) {
+				tempNode.child = new CompressedHashTrie();
+			}
+			
+			if (tempNode instanceof TrieStrHash && strNode instanceof TrieStrHash) {
+				TrieStrHash tempStrHash = (TrieStrHash) tempNode;
+				String value = tempStrHash.getVal();
+				//tempStrHash.changeStr(value.charAt(0) + "");
+				
+				TrieCharHash tempCharHash = new TrieCharHash(value.charAt(0), new CompressedHashTrie(), null);
+				tempCharHash.entries = tempStrHash.entries;
+				this.root.remove(tempStrHash);
+				this.root.put(tempCharHash);
+				
+				TrieStrHash newStrNode = (TrieStrHash) strNode;
+				
+				Set<Entry> entries = newStrNode.entries;
+				for (int i = 0; i < entries.size(); i++) {
+					tempCharHash.addEntry((Entry)entries.getVal(i));
+				}
+				
+				if (value.length() > 1) {
+					TrieStrHash tempStrHashShorter = new TrieStrHash(value.substring(1), null, null);
+					tempStrHashShorter.entries = tempCharHash.entries;
+					//tempStrHash.addEntry(strNode.getFirstEntry()); //update entry list
+					tempCharHash.child.insert3(tempStrHashShorter);	
+				}
+				
+				if (newStrNode.getVal().length() > 1) {
+					newStrNode.changeStr(newStrNode.getVal().substring(1));
+					tempCharHash.child.insert3(newStrNode);
+				}
+
+			} else if(tempNode instanceof TrieCharHash && strNode instanceof TrieStrHash) {
+				TrieCharHash tempCharHash = (TrieCharHash) tempNode;
+				
+				TrieStrHash newStrNode = (TrieStrHash) strNode;
+				
+				Set<Entry> entries = newStrNode.entries;
+				for (int i = 0; i < entries.size(); i++) {
+					tempCharHash.addEntry((Entry)entries.getVal(i));
+				}
+				
+				if (newStrNode.getVal().length() > 1) {
+					newStrNode.changeStr(newStrNode.getVal().substring(1));
+					tempCharHash.child.insert3(newStrNode);
+				}
+			}
+		}
+		
+		return true;
 	}
 
 	private boolean insert2(TrieStrHash strNode) {

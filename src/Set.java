@@ -30,24 +30,28 @@ public class Set<T> {
 		}
 	}
 
-	/** Add an item to the set, don't care about and don't check for duplicates.
+	/** Add an item to the set, don't care about and DO check for duplicates.
 	 * @param o the item to add
 	 * @return true if added, false otherwise (was duplicate)
 	*/
 	@SuppressWarnings("unchecked")
 	public final boolean add(final Object o) {
-		//doubles size of array if full
-		if (size == this.theSet.length) {
-			//create temp array to hold value of theSet[]
-			T[] temp = (T[]) new Object[this.theSet.length * 2];
-			for (int i = 0; i < size; i++) {
-				temp[i] = this.theSet[i];
+		if (!this.contains(o)) {
+			//doubles size of array if full
+			if (size == this.theSet.length) {
+				//create temp array to hold value of theSet[]
+				T[] temp = (T[]) new Object[this.theSet.length * 2];
+				for (int i = 0; i < size; i++) {
+					temp[i] = this.theSet[i];
+				}
+				this.theSet = temp;
 			}
-			this.theSet = temp;
+			//cast "o" and add to end of array
+			theSet[size++] = (T) o;
+			return true;
+		} else {
+			return false;
 		}
-		//cast "o" and add to end of array
-		theSet[size++] = (T) o;
-		return true;
 	}
 
 	/** Remove an item from the set if it's there.
