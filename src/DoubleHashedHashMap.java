@@ -296,13 +296,13 @@ public class DoubleHashedHashMap<K> implements Iterable<K> {
 	}
 
 	private class HashIterator implements Iterator<K> {
-		//return new Iterator<A> {
+		//return new Iterator<A> { //can't get anonymous class working
 		private int index = 0;
 		public boolean hasNext() {
-			while (hashMap[index] == null) {
+			while (index <= hashMap.length - 1 && hashMap[index] == null) {
 				index++;
 			}
-			return (index <= size);
+			return index <= hashMap.length - 1;
 		}
 		public K next() {
 			return hashMap[index++];
