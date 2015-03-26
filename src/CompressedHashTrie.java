@@ -30,12 +30,12 @@ public class CompressedHashTrie {
 		protected boolean leaf;
 		
 		/* Pointer to subsequent hash map. */
-		protected CompressedHashTrie child = new CompressedHashTrie();
+		protected CompressedHashTrie child;
 		
 	//	TODO - make this list of references to entries
 	//	TODO - make this a skip list data structure (JEFF SAID WE DONT NEED THIS...?)
 		/* list of object references to unordered master Set */
-		protected Set<Entry> entries = new Set<>();
+		protected Set<Entry> entries;
 		
 		/**
 		 * Determine if got is leaf or not.
@@ -46,6 +46,9 @@ public class CompressedHashTrie {
 		}
 
 		private TrieHashNode(CompressedHashTrie child, Entry e) {
+			child = new CompressedHashTrie();
+			entries = new Set<Entry>();
+
 			this.child = child;
 			this.entries.add(e);
 		}
@@ -177,7 +180,7 @@ public class CompressedHashTrie {
 
 		@Override
 		public String toString() {
-			return "(" + this.val + ")";
+			return "(" + this.val +  ":" + entries + ")";
 		}
 
 		@Override
@@ -240,10 +243,15 @@ public class CompressedHashTrie {
 				String value = tempStrHash.getVal();
 
 				TrieCharHash tempCharHash = new TrieCharHash(value.charAt(0),
-					new CompressedHashTrie(), null);
+					new CompressedHashTrie(), tempStrHash.getFirstEntry());
+				
 				//System.out.printf("%s - %s\n", tempStrHash, tempStrHash.entries);
-				tempCharHash.entries = tempStrHash.entries;
+				
+				//tempCharHash.entries = tempStrHash.entries;
+				
+				//tempCharHash.addEntry(tempStrHash.getFirstEntry());
 				//System.out.printf("%s - %s\n", tempCharHash, tempCharHash.entries);
+				
 				this.root.remove(tempStrHash);
 				this.root.put(tempCharHash);
 				
@@ -565,7 +573,13 @@ public class CompressedHashTrie {
 		System.out.printf("\n%s\n", trie);
 		trie.breadthFirstTraversal(trie);
 		
-		trie.remove("by sad sap", "e3");
+		trie.remove("by sad sap", "e3"); //TODO - needs to be changed so ust uses ID
+
+		System.out.printf("After remove...\n%s\n", trie);
+		trie.breadthFirstTraversal(trie);
+
+
+
 
 	}
 }

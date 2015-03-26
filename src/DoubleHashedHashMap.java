@@ -1,5 +1,7 @@
 //TODO - make sure that hash size is always prime
 
+import java.util.UUID;
+
 import java.util.Iterator;
 import java.lang.Iterable;
 /**
@@ -236,11 +238,12 @@ public class DoubleHashedHashMap<K> implements Iterable<K> {
 	 * @return new integer hash code
 	 */
 	private int secondHashFunction(K key) {
-		int result = (key.hashCode() / 10) % (this.hashMap.length / 2);
+		//TODO - make second hash unique and not enter infinite loop
+		/*int result = (key.hashCode() / 10) % (this.hashMap.length / 2);
 		if (result < 0) {
 			result *= -1;
-		}
-		return (result * 2) + 1;	
+		}*/
+		return 1; //(result * 2) + 1;	
 	}
 	
 	/**
@@ -311,5 +314,38 @@ public class DoubleHashedHashMap<K> implements Iterable<K> {
 			throw new UnsupportedOperationException();
 		}
 	}
+/* TESTING
+	public static class Node {
+		private String id;
+		public Node() {
+			id = "";
+		}
+		public Node(String str) {
+			id = str;
+		}
 
+		@Override
+		public int hashCode() {
+			return id.hashCode();
+		}
+
+		@Override
+		public String toString() {
+			return id;
+		}
+	}
+
+	public static void main(String[] args) {
+		DoubleHashedHashMap<Node> hash = new DoubleHashedHashMap<>(); 
+		long time = System.currentTimeMillis();
+		for (int i = 0; i < 100; i++) {
+			hash.put(new Node("h" + i));
+			if (i%10 == 0) {
+				System.out.printf("%d @ %d\n", i, System.currentTimeMillis() - time);
+			}
+		}
+		time -= System.currentTimeMillis();
+		System.out.printf("done in %d\n", -1*time);
+	}
+END TESTING */
 }
