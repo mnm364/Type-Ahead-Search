@@ -5,9 +5,9 @@
  * ^^b/c of this, inputting same string in twice will make the whole string single chars.. :(
  */
 
+import java.util.ArrayList;
 import java.util.Queue;
 import java.util.LinkedList;
-
 import java.util.Iterator;
 
 /**
@@ -21,6 +21,7 @@ public class CompressedHashTrie {
 	/* Root of the trie. */
 	private DoubleHashedHashMap<TrieHashNode> root;
 	
+	private Set<Entry> allEntries;
 	/**
 	 * 
 	 *
@@ -195,10 +196,12 @@ public class CompressedHashTrie {
 	 */
 	public CompressedHashTrie(DoubleHashedHashMap<TrieHashNode> root) {
 		this.root = root;
+		this.allEntries = new Set<Entry>();
 		//TODO - stuff (copy constructor, etc...)
 	}
 	public CompressedHashTrie() {
-		this(new DoubleHashedHashMap<TrieHashNode>(5)); //was NULL
+		this(new DoubleHashedHashMap<TrieHashNode>(5));//was NULL
+		this.allEntries = new Set<Entry>();
 	}
 	
 	/**
@@ -214,9 +217,59 @@ public class CompressedHashTrie {
 		/* insert individual words into trie */
 		for (int i = 0; i < words.length; i++) {
 			System.out.printf("- insert %s:{%s}\n", words[i],e);
-			this.insert3(new TrieStrHash(words[i], null, e));
+			allEntries.add(e);
+			this.insert4(new TrieStrHash(words[i], null, e));
 		}
 	}
+	
+	private boolean insert4(TrieHashNode strNode) {
+		//boolean putSuccess = this.root.put(strNode);
+		TrieHashNode tempNode = this.root.get(strNode);
+
+		if (tempNode != null) { //!putSuccess) {
+			//The first letter of strNode is already in the hash map
+			//TrieHashNode tempNode = this.root.get(strNode);
+
+			if (tempNode.child == null) {
+				tempNode.child = new CompressedHashTrie();
+			}
+			
+			if (tempNode instanceof TrieStrHash && strNode instanceof TrieStrHash) {
+				TrieStrHash tempStrHash = (TrieStrHash) tempNode;
+				String value = tempStrHash.getVal();
+
+				TrieStrHash newStrNode = (TrieStrHash) strNode;
+				
+				int index = compress(value, newStrNode.val);
+				
+				tempStrHash.changeStr(value.substring(0, index));
+				
+				Set<Entry> entries = newStrNode.entries;
+				for (int i = 0; i < entries.size(); i++) {
+					tempStrHash.addEntry((Entry)entries.getVal(i));
+				}
+				
+				if (value.length() > index) {
+					TrieStrHash tempStrHashShorter = new TrieStrHash(value.substring(index), null, 
+						tempStrHash.getFirstEntry());
+					tempStrHash.child.insert4(tempStrHashShorter);	
+				}
+				
+				if (newStrNode.getVal().length() > index) {
+					newStrNode.changeStr(newStrNode.getVal().substring(index));
+					tempStrHash.child.insert4(newStrNode);
+				}
+			}
+		} else {
+			//doesnt exist in hash map yet
+			this.root.put(strNode);
+		}
+
+		return true;
+	}
+	
+	
+	
 	
 	/**
 	 * This method inserts a new TrieStrHash object into the CompressedHashTrie.
@@ -474,6 +527,109 @@ public class CompressedHashTrie {
 		return false;
 	}
 	
+	public boolean remove2(String id) {
+		int index = this.allEntries.search(id);
+		if (index != -1) {
+			Entry tempEntry = (Entry) this.allEntries.getVal(index);
+			String words[] = tempEntry.getDataStr().toLowerCase().split("\\s+");
+			for (int i = 0; i < words.length; i++) {
+				TrieHashNode tempNode = this.root.get(new TrieStrHash(words[i], null, null));
+				if (tempNode != null) {
+					this.remove2(tempNode, words[i], id);
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+	
+	private boolean remove2(TrieHashNode tempNode, String str, String id) {
+		
+		if (tempNode instanceof TrieStrHash) {
+			TrieStrHash tempStrNode = (TrieStrHash) tempNode;
+			Set<Entry> entries = tempStrNode.entries;
+			
+			if (entries.size() > 1) {
+				if (tempStrNode.child != null) {
+					String value = tempStrNode.getVal();
+					
+					int index = compress(value, str);
+					
+					str = str.substring(index);
+					
+					TrieHashNode tempHashNode = tempStrNode.child.root.get(new TrieStrHash(str, null, null));
+					if (tempHashNode != null) {
+						if (tempHashNode.entries.size() == 1){
+							tempStrNode.child.root.remove(tempHashNode);
+						}
+						this.remove2(tempHashNode, str, id);
+						
+						/*
+						if (tempHashNode.child.root.size() == 1 && tempHashNode instanceof TrieStrHash) {
+							TrieStrHash theStrNode = (TrieStrHash) tempHashNode;
+							
+							int indexOfWord = this.allEntries.search(theStrNode.getFirstEntry().getId());
+							Entry tempEntry = (Entry)this.allEntries.getVal(indexOfWord);
+							String words[] = tempEntry.getDataStr().toLowerCase().split("\\s+");
+							TrieStrHash childStrNode = null;
+							for (int i = 0; i < words.length; i++) {
+								//childStrNode = (TrieStrHash) this.root.get(new TrieStrHash(words[i], null, null));
+								int indexOfLetter = words[i].indexOf(theStrNode.val);
+								if (indexOfLetter != -1 && indexOfLetter != words[i].length()-1) {
+									childStrNode = (TrieStrHash)theStrNode.child.root.get(new TrieStrHash(words[i].substring(indexOfLetter+1),null,null));
+									if (childStrNode != null) {
+										break;
+									}
+								}
+							}
+							
+							theStrNode.changeStr(theStrNode.val + childStrNode.val);
+							if (childStrNode.child.root.size() > 0) {
+								Iterator<TrieHashNode> mapIterator = childStrNode.child.root.iterator();
+								while (mapIterator.hasNext()) {
+									TrieHashNode nodeFromMap = mapIterator.next();
+									theStrNode.child.root.put(nodeFromMap);
+								}
+							}
+							theStrNode.child.root.remove(childStrNode);
+						}*/
+					}
+				}
+			}
+			entries.remove(id);
+
+		} 
+
+		return false;
+	}
+	
+	private void pullNodesUp(TrieHashNode parent, TrieHashNode child) {
+		
+		if (parent instanceof TrieStrHash && child instanceof TrieStrHash) {
+			TrieStrHash strParent = (TrieStrHash) parent;
+			TrieStrHash strChild = (TrieStrHash) child;
+			int indexOfWord = this.allEntries.search(strChild.getFirstEntry().getId());
+			Entry tempEntry = (Entry)this.allEntries.getVal(indexOfWord);
+			String words[] = tempEntry.getDataStr().toLowerCase().split("\\s+");
+			ArrayList<TrieStrHash> childArray = new ArrayList<TrieStrHash>();
+			for (int i = 0; i < words.length; i++) {
+				//childStrNode = (TrieStrHash) this.root.get(new TrieStrHash(words[i], null, null));
+				int indexOfLetter = words[i].indexOf(strChild.val);
+				if (indexOfLetter != -1 && indexOfLetter != words[i].length()-1) {
+					TrieStrHash childStrNode = (TrieStrHash)strChild.child.root.get(new TrieStrHash(words[i].substring(indexOfLetter+1),null,null));
+					if (childStrNode != null) {
+						childArray.add(childStrNode);
+					}
+				}
+			}
+			
+			for (int i = 0; i < childArray.size(); i++) {
+				strParent.child.root.put(childArray.get(i));
+			}
+		}
+		
+	}
+	
 	private boolean remove(TrieHashNode tempNode, String str, String id) {
 		
 		if (tempNode instanceof TrieStrHash) {
@@ -528,9 +684,34 @@ public class CompressedHashTrie {
 	 * 
 	 * @return true if compression happened; otherwise, false
 	 */
-	private boolean compress() {
-		//TODO - method stub
-		return false;
+	private int compress(String first, String second) {
+		int i = 0, j = 0;
+		boolean foundDiff = false;
+		String firstLetter = null, secondLetter = null;
+		while (!foundDiff) {
+			if (i < first.length()) {
+				firstLetter = first.charAt(i) + "";
+			}
+			
+			if (j < second.length()) {
+				secondLetter = second.charAt(j) + "";
+			}
+			
+			if (firstLetter == null || secondLetter == null){
+				foundDiff = true;
+				if (i > j) {
+					i = j;
+				}
+			} else if (!firstLetter.equals(secondLetter)) {
+				foundDiff = true;
+			} else {
+				i++;
+				j++;
+				firstLetter = null;
+				secondLetter = null;
+			}
+		}
+		return i;
 	}
 
 	//Breadth first traversal of trie
@@ -563,7 +744,7 @@ public class CompressedHashTrie {
 	public static void main(String[] args) {
 		System.out.println("testing compressed hash trie...");
 		CompressedHashTrie trie = new CompressedHashTrie();
-		String[] words = {"sap","b soda","bob","by sad sap"};
+		String[] words = {"sappling","b soda","bob","by sad sodaman sapplingerman"};
 		for (int i = 0; i < 4; i++) {
 			Entry e = new Entry("e" + Integer.toString(i), 'b', 10, words[i]);
 			System.out.printf("ENTRY #%d\n", i);
@@ -573,7 +754,7 @@ public class CompressedHashTrie {
 		System.out.printf("\n%s\n", trie);
 		trie.breadthFirstTraversal(trie);
 		
-		trie.remove("by sad sap", "e3"); //TODO - needs to be changed so ust uses ID
+		trie.remove2("e3"); //TODO - needs to be changed so just uses ID
 
 		System.out.printf("After remove...\n%s\n", trie);
 		trie.breadthFirstTraversal(trie);
