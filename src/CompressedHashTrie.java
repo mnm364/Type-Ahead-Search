@@ -568,6 +568,13 @@ public class CompressedHashTrie {
 						tempStrNode.child.root.remove(tempHashNode);
 						if (tempStrNode.child.root.size() == 0) {
 							tempStrNode.leaf = true;
+						} if (tempStrNode.child.root.size() == 1) {
+							Iterator<TrieHashNode> it = tempStrNode.child.root.iterator();
+							TrieStrHash theOtherChild = null; 
+							if (it.hasNext()) {
+								theOtherChild = (TrieStrHash) it.next();
+							}
+							this.pullNodesUp(tempStrNode, theOtherChild);
 						}
 					}
 					this.remove2(tempHashNode, str, id);
@@ -586,23 +593,22 @@ public class CompressedHashTrie {
 		if (parent instanceof TrieStrHash && child instanceof TrieStrHash) {
 			TrieStrHash strParent = (TrieStrHash) parent;
 			TrieStrHash strChild = (TrieStrHash) child;
-			int indexOfWord = this.allEntries.search(strChild.getFirstEntry().getId());
-			Entry tempEntry = (Entry)this.allEntries.getVal(indexOfWord);
-			String words[] = tempEntry.getDataStr().toLowerCase().split("\\s+");
-			ArrayList<TrieStrHash> childArray = new ArrayList<TrieStrHash>();
-			for (int i = 0; i < words.length; i++) {
-				//childStrNode = (TrieStrHash) this.root.get(new TrieStrHash(words[i], null, null));
-				int indexOfLetter = words[i].indexOf(strChild.val);
-				if (indexOfLetter != -1 && indexOfLetter != words[i].length()-1) {
-					TrieStrHash childStrNode = (TrieStrHash)strChild.child.root.get(new TrieStrHash(words[i].substring(indexOfLetter+1),null,null));
-					if (childStrNode != null) {
-						childArray.add(childStrNode);
-					}
+			
+			if (strChild.isLeaf()) {
+				strParent.leaf = true;
+				strParent.changeStr(strParent.val + strChild.val);
+				strParent.child.root.remove(strChild);
+			} else {
+				Iterator<TrieHashNode> iterator = strChild.child.root.iterator();
+				ArrayList<TrieStrHash> childArray = new ArrayList<TrieStrHash>(); 
+				if (iterator.hasNext()) {
+					childArray.add((TrieStrHash) iterator.next());
 				}
-			}
-
-			for (int i = 0; i < childArray.size(); i++) {
-				strParent.child.root.put(childArray.get(i));
+				for (int i = 0; i < childArray.size(); i++) {
+					strParent.child.root.put(childArray.get(i));
+				}
+				strParent.changeStr(strParent.val + strChild.val);
+				strParent.child.root.remove(strChild);
 			}
 		}
 
