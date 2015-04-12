@@ -6,6 +6,7 @@
  */
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.LinkedList;
 import java.util.Iterator;
@@ -548,6 +549,7 @@ public class CompressedHashTrie {
 
 	private boolean remove2(TrieHashNode tempNode, String str, String id) {
 
+		//Only expecting TrieStrHashes...
 		if (tempNode instanceof TrieStrHash) {
 			TrieStrHash tempStrNode = (TrieStrHash) tempNode;
 			Set<Entry> entries = tempStrNode.entries;
@@ -565,10 +567,13 @@ public class CompressedHashTrie {
 
 				if (tempHashNode != null) {
 					if (tempHashNode.isLeaf()){
-						tempStrNode.child.root.remove(tempHashNode);
+						//if the node is a leaf, it is safe to remove it
+						tempStrNode.child.root.remove(tempHashNode); 
 						if (tempStrNode.child.root.size() == 0) {
+							//setting the node to a leaf
 							tempStrNode.leaf = true;
 						} if (tempStrNode.child.root.size() == 1) {
+							//recompression
 							Iterator<TrieHashNode> it = tempStrNode.child.root.iterator();
 							TrieStrHash theOtherChild = null; 
 							if (it.hasNext()) {
@@ -588,6 +593,12 @@ public class CompressedHashTrie {
 		return false;
 	}
 
+	/**
+	 * This method pulls up the child's children and make them children of the parent.
+	 * It then changes the parent's data string to accommodate and removes the child.
+	 * @param parent The parent node
+	 * @param child The child node
+	 */
 	private void pullNodesUp(TrieHashNode parent, TrieHashNode child) {
 
 		if (parent instanceof TrieStrHash && child instanceof TrieStrHash) {
@@ -664,9 +675,12 @@ public class CompressedHashTrie {
 	}
 
 	/**
-	 * 
-	 * 
-	 * @return true if compression happened; otherwise, false
+	 * This method gets two strings as input and finds the
+	 * index of the first character that is different between
+	 * the two strings
+	 * @param first The first string
+	 * @param second The second string
+	 * @return index of the character that is different 
 	 */
 	private int compress(String first, String second) {
 		int i = 0, j = 0;
@@ -696,6 +710,82 @@ public class CompressedHashTrie {
 			}
 		}
 		return i;
+	}
+	
+	/**
+	 * This method searches for the queryString in the map
+	 * @param numberOfResults The number of results wanted
+	 * @param queryString The query string
+	 * @return A list of strings of ids
+	 */
+	public List<String> search(int numberOfResults, String queryString) {
+		DoubleHashedHashMap<QueryEntry> map = new DoubleHashedHashMap<QueryEntry>();
+		ArrayList<String> idList = new ArrayList<String>();
+		String words[] = queryString.toLowerCase().split("\\s+");
+
+		/* insert individual words into trie */
+		for (int i = 0; i < words.length; i++) {
+			TrieStrHash temp = new TrieStrHash(words[i], null, null);
+			this.search(temp, map);
+		}
+		
+		Iterator<QueryEntry> iterator = map.iterator();
+		while(iterator.hasNext()) {
+			QueryEntry tempEntry = iterator.next();
+			//checks if the entry is correct
+			if (tempEntry.getFrequency() == words.length) {
+				//limits the number of results returned
+				if (idList.size() < numberOfResults) {
+					idList.add(tempEntry.getId());
+				}
+			}
+		}
+		
+		return idList;
+	}
+	
+	/**
+	 * This method searches for the a String in the trie.
+	 * It fills the map with QueryEntry objects when it finds a node that should be
+	 * ing the map.
+	 * @param strNode The query node
+	 * @param map The map of QueryEntries
+	 */
+	private void search(TrieHashNode strNode, DoubleHashedHashMap<QueryEntry> map) {
+		TrieHashNode tempNode = this.root.get(strNode);
+		if (tempNode != null){
+			//Node exists
+			if (tempNode instanceof TrieStrHash && strNode instanceof TrieStrHash) {
+				TrieStrHash tempStrNode = (TrieStrHash) tempNode;
+				String value = tempStrNode.val;
+				TrieStrHash queryStrNode = (TrieStrHash) strNode;
+				
+				if (!queryStrNode.val.equals(value) && queryStrNode.val.length() >= value.length()) {
+					//Check if we need to go down more levels
+					int index = compress(value, queryStrNode.val);
+					if (queryStrNode.getVal().length() > index) {
+						queryStrNode.changeStr(queryStrNode.getVal().substring(index));
+						tempStrNode.child.search(queryStrNode, map);
+					}
+				} else {
+					//We want the entries from this node
+					for (int i = 0; i < tempStrNode.entries.size(); i++) {
+						Entry tempEntry = (Entry)tempStrNode.entries.getVal(i);
+						String id = tempEntry.getId();
+						QueryEntry tempQueryEntry = new QueryEntry(id,1);
+						QueryEntry prevQueryEntry = map.get(tempQueryEntry);
+						if (prevQueryEntry != null) {
+							prevQueryEntry.setFrequency(prevQueryEntry.getFrequency() + 1);
+						} else {
+							map.put(tempQueryEntry);
+						}
+					}
+					
+				}
+				
+				
+			}
+		}
 	}
 
 	//Breadth first traversal of trie
@@ -738,10 +828,11 @@ public class CompressedHashTrie {
 		System.out.printf("\n%s\n", trie);
 		trie.breadthFirstTraversal(trie);
 
-		trie.remove2("e3"); //TODO - needs to be changed so just uses ID
+		System.out.println(trie.search(4, "b"));
+		//trie.remove2("e3"); //TODO - needs to be changed so just uses ID
 
-		System.out.printf("After remove...\n%s\n", trie);
-		trie.breadthFirstTraversal(trie);
+		//System.out.printf("After remove...\n%s\n", trie);
+		//trie.breadthFirstTraversal(trie);
 
 
 
