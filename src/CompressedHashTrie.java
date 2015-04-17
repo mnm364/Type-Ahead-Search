@@ -6,6 +6,7 @@
  */
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
 import java.util.LinkedList;
@@ -719,8 +720,27 @@ public class CompressedHashTrie {
 	 * @return A list of strings of ids
 	 */
 	public List<String> search(int numberOfResults, String queryString) {
-		DoubleHashedHashMap<QueryEntry> map = new DoubleHashedHashMap<QueryEntry>();
+		ArrayList<Entry> entryList = (ArrayList<Entry>) genericSearch(queryString);
+		Collections.sort(entryList);
 		ArrayList<String> idList = new ArrayList<String>();
+		
+		for (int i = 0; i < entryList.size(); i++) {
+			if (idList.size() < numberOfResults) {
+				idList.add(entryList.get(i).getId());
+			}
+		}
+		
+		return idList;
+	}
+	
+	/**
+	 * This is a generic search method. 
+	 * @param queryString The string to find
+	 * @return The list of entry objects that have been found from the query
+	 */
+	private List<Entry> genericSearch(String queryString) {
+		DoubleHashedHashMap<QueryEntry> map = new DoubleHashedHashMap<QueryEntry>();
+		ArrayList<Entry> idList = new ArrayList<Entry>();
 		String words[] = queryString.toLowerCase().split("\\s+");
 
 		/* insert individual words into trie */
@@ -735,13 +755,99 @@ public class CompressedHashTrie {
 			//checks if the entry is correct
 			if (tempEntry.getFrequency() == words.length) {
 				//limits the number of results returned
-				if (idList.size() < numberOfResults) {
-					idList.add(tempEntry.getId());
-				}
+				idList.add(tempEntry.getEntry());
 			}
 		}
 		
 		return idList;
+	}
+	
+	/**
+	 * This is a weighted query for a string in the map.
+	 * @param numberOfResults The number of results wanted
+	 * @param queryString The string to find
+	 * @param numberOfBoosts The number of boosts
+	 * @param boosts The List of boosts
+	 * @return A list of strings of ids
+	 */
+	public List<String> weightedSearch(int numberOfResults, String queryString, int numberOfBoosts, List<Boost> boosts) {
+		ArrayList<Entry> idListUnsorted = (ArrayList<Entry>) genericSearch(queryString);
+		
+		if (numberOfBoosts != 0) {
+			//Weight the search
+			//TODO account for id's as boosts
+			//TODO calculate total boosts correctly (if an item has multiple boosts
+			//it is the sum of the boosts multiplied by the raw score of the entry)
+			Collections.sort(boosts);
+			
+			//index 0: user
+			//index 1: topic
+			//index 2: question
+			//index 3: board
+			int[] boostValues = {1, 1, 1, 1};
+			
+			for (int i = 0; i < boosts.size(); i++) {
+				Boost tempBoost = boosts.get(i);
+				
+				switch (tempBoost.getType()) {
+					case 'u':
+						boostValues[0] = tempBoost.getBoostValue();
+						break;
+					case 't':
+						boostValues[1] = tempBoost.getBoostValue();
+						break;
+					case 'q':
+						boostValues[2] = tempBoost.getBoostValue();
+						break;
+					case 'b':
+						boostValues[3] = tempBoost.getBoostValue();
+						break;
+					default:
+						break;
+				}
+			}
+			
+			for (int i = 0; i < idListUnsorted.size(); i++) {
+				Entry tempEntry = idListUnsorted.get(i);
+				
+				switch (tempEntry.getType()) {
+					case 'u':
+						tempEntry.setScore(boostValues[0]);
+						break;
+					case 't':
+						tempEntry.setScore(boostValues[1]);
+						break;
+					case 'q':
+						tempEntry.setScore(boostValues[2]);
+						break;
+					case 'b':
+						tempEntry.setScore(boostValues[3]);
+						break;
+					default:
+						break;
+				}
+			}
+			
+			List <String> idList = new ArrayList<String>();
+			Collections.sort(idListUnsorted);
+			for (int i = 0; i < idListUnsorted.size(); i++) {
+				if (idList.size() < numberOfResults) {
+					idList.add(idListUnsorted.get(i).getId());
+				}
+			}
+			return idList;
+			
+		} else {
+			List <String> idList = new ArrayList<String>();
+			Collections.sort(idListUnsorted);
+			for (int i = 0; i < idListUnsorted.size(); i++) {
+				if (idList.size() < numberOfResults) {
+					idList.add(idListUnsorted.get(i).getId());
+				}
+			}
+			return idList;
+		}
+		
 	}
 	
 	/**
@@ -771,8 +877,7 @@ public class CompressedHashTrie {
 					//We want the entries from this node
 					for (int i = 0; i < tempStrNode.entries.size(); i++) {
 						Entry tempEntry = (Entry)tempStrNode.entries.getVal(i);
-						String id = tempEntry.getId();
-						QueryEntry tempQueryEntry = new QueryEntry(id,1);
+						QueryEntry tempQueryEntry = new QueryEntry(tempEntry,1);
 						QueryEntry prevQueryEntry = map.get(tempQueryEntry);
 						if (prevQueryEntry != null) {
 							prevQueryEntry.setFrequency(prevQueryEntry.getFrequency() + 1);
@@ -819,16 +924,42 @@ public class CompressedHashTrie {
 		System.out.println("testing compressed hash trie...");
 		CompressedHashTrie trie = new CompressedHashTrie();
 		String[] words = {"sappling","b soda","bob","by sad sodaman sapplingerman"};
-		for (int i = 0; i < 4; i++) {
+		/*for (int i = 0; i < 4; i++) {
 			Entry e = new Entry("e" + Integer.toString(i), 'b', 10, words[i]);
 			System.out.printf("ENTRY #%d\n", i);
 			trie.insert(e);
-		}
+		}*/
+		
+		Entry e0 = new Entry("e" + Integer.toString(0), 'u', 10, words[0]);
+		System.out.printf("ENTRY #%d\n", 0);
+		trie.insert(e0);
+		
+		Entry e1 = new Entry("e" + Integer.toString(1), 't', 10, words[1]);
+		System.out.printf("ENTRY #%d\n", 1);
+		trie.insert(e1);
+		
+		Entry e2 = new Entry("e" + Integer.toString(2), 'q', 10, words[2]);
+		System.out.printf("ENTRY #%d\n", 2);
+		trie.insert(e2);
+		
+		Entry e3 = new Entry("e" + Integer.toString(3), 'b', 10, words[3]);
+		System.out.printf("ENTRY #%d\n", 3);
+		trie.insert(e3);
 
 		System.out.printf("\n%s\n", trie);
 		trie.breadthFirstTraversal(trie);
 
-		System.out.println(trie.search(4, "b"));
+		//normal search
+		System.out.println(trie.search(3, "b"));
+		
+		//weighted search, no boosts
+		System.out.println(trie.weightedSearch(2, "b", 0, null));
+		
+		//weighted search, boosts
+		List<Boost> boostList = new ArrayList<Boost>();
+		boostList.add(new Boost('b', 50));
+		boostList.add(new Boost('q', 100));
+		System.out.println(trie.weightedSearch(2, "b", 2, boostList));
 		//trie.remove2("e3"); //TODO - needs to be changed so just uses ID
 
 		//System.out.printf("After remove...\n%s\n", trie);

@@ -1,15 +1,15 @@
 
 public class QueryEntry {
-	private String id;
+	private Entry entry;
 	private int frequency;
 	
-	public QueryEntry(String id, int frequency) {
-		this.id = id;
+	public QueryEntry(Entry entry, int frequency) {
+		this.entry = entry;
 		this.frequency = frequency;
 	}
 	
-	public QueryEntry(String id) {
-		this.id = id;
+	public QueryEntry(Entry entry) {
+		this.entry = entry;
 		this.frequency = 0;
 	}
 	
@@ -17,30 +17,30 @@ public class QueryEntry {
 	public boolean equals (Object o) {
 		if (o instanceof QueryEntry) {
 			QueryEntry temp = (QueryEntry) o;
-			return this.id.equals(temp.id);
+			return this.entry.equals(temp.entry);
 		} else if (o instanceof String) {
 			String data = (String) o;
-			return this.id.equals(data);
+			return this.entry.equals(data);
 		}
 		return false;
 	}
 	
 	@Override
 	public int hashCode() {
-		return id.hashCode();
+		return entry.getId().hashCode();
 	}
 	
 	@Override
 	public String toString() {
-		return this.id;
+		return "QueryEntry [entry=" + entry + ", frequency=" + frequency + "]";
 	}
 
-	public String getId() {
-		return id;
+	public Entry getEntry() {
+		return this.entry;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public void setEntry(Entry entry) {
+		this.entry = entry;
 	}
 
 	public int getFrequency() {

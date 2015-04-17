@@ -4,7 +4,7 @@
  * 
  * @author Michael Miller, Jeffrey Sham
  */
-public class Entry {
+public class Entry implements Comparable<Entry>{
 	
 	/** Unique ID for each entry */
 	private String id;
@@ -61,6 +61,10 @@ public class Entry {
 	public String getDataStr() {
 		return dataStr;
 	}
+	
+	public void setScore(float score) {
+		this.score *= score;
+	}
 
 	@Override
 	public String toString() {
@@ -83,5 +87,20 @@ public class Entry {
 	@Override
 	public int hashCode() {
 		return super.hashCode();
+	}
+
+	@Override
+	public int compareTo(Entry obj) {
+		if (getClass() == obj.getClass()) {
+			Entry other = (Entry) obj;
+			if (other.score > this.score) {
+				return 1;
+			} else if (other.score < this.score) {
+				return -1;
+			} else {
+				return 0;
+			}
+		}
+		return 0;
 	}
 }
