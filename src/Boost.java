@@ -1,9 +1,9 @@
 
 public class Boost implements Comparable<Boost>{
-	private char type;
+	private String type;
 	private int boostValue;
 	
-	public Boost(char type, int boost) {
+	public Boost(String type, int boost) {
 		this.type = type;
 		this.boostValue = boost;
 	}
@@ -13,7 +13,7 @@ public class Boost implements Comparable<Boost>{
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + boostValue;
-		result = prime * result + type;
+		result = prime * result + type.hashCode();
 		return result;
 	}
 
@@ -28,7 +28,7 @@ public class Boost implements Comparable<Boost>{
 		Boost other = (Boost) obj;
 		if (boostValue != other.boostValue)
 			return false;
-		if (type != other.type)
+		if (!type.equals(other.type))
 			return false;
 		return true;
 	}
@@ -54,11 +54,11 @@ public class Boost implements Comparable<Boost>{
 		return "Boost [type=" + type + ", boostValue=" + boostValue + "]";
 	}
 
-	public char getType() {
+	public String getType() {
 		return type;
 	}
 
-	public void setType(char type) {
+	public void setType(String type) {
 		this.type = type;
 	}
 

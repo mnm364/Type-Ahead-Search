@@ -775,9 +775,6 @@ public class CompressedHashTrie {
 		
 		if (numberOfBoosts != 0) {
 			//Weight the search
-			//TODO account for id's as boosts
-			//TODO calculate total boosts correctly (if an item has multiple boosts
-			//it is the sum of the boosts multiplied by the raw score of the entry)
 			Collections.sort(boosts);
 			
 			//index 0: user
@@ -785,46 +782,59 @@ public class CompressedHashTrie {
 			//index 2: question
 			//index 3: board
 			int[] boostValues = {1, 1, 1, 1};
-			
+			List<Boost> boostsForId = new ArrayList<Boost>();
 			for (int i = 0; i < boosts.size(); i++) {
 				Boost tempBoost = boosts.get(i);
 				
-				switch (tempBoost.getType()) {
-					case 'u':
+				switch (tempBoost.getType().toLowerCase()) {
+					case "user":
 						boostValues[0] = tempBoost.getBoostValue();
 						break;
-					case 't':
+					case "topic":
 						boostValues[1] = tempBoost.getBoostValue();
 						break;
-					case 'q':
+					case "question":
 						boostValues[2] = tempBoost.getBoostValue();
 						break;
-					case 'b':
+					case "board":
 						boostValues[3] = tempBoost.getBoostValue();
 						break;
 					default:
+						boostsForId.add(tempBoost);
 						break;
 				}
 			}
 			
 			for (int i = 0; i < idListUnsorted.size(); i++) {
 				Entry tempEntry = idListUnsorted.get(i);
-				
+				int boostValue = 0;
 				switch (tempEntry.getType()) {
 					case 'u':
-						tempEntry.setScore(boostValues[0]);
+						boostValue += boostValues[0];
 						break;
 					case 't':
-						tempEntry.setScore(boostValues[1]);
+						boostValue += boostValues[1];
 						break;
 					case 'q':
-						tempEntry.setScore(boostValues[2]);
+						boostValue += boostValues[2];
 						break;
 					case 'b':
-						tempEntry.setScore(boostValues[3]);
+						boostValue += boostValues[3];
 						break;
 					default:
 						break;
+				}
+				for (int j = 0; j < boostsForId.size(); j++) {
+					Boost tempBoost = boostsForId.get(j);
+					if (tempEntry.getId().equals(tempBoost.getType())) {
+						boostValue += tempBoost.getBoostValue();
+						boostsForId.remove(j);
+						break;
+					}
+				}
+				
+				if (boostValue != 0) {
+					tempEntry.setScore(boostValue);
 				}
 			}
 			
@@ -957,9 +967,10 @@ public class CompressedHashTrie {
 		
 		//weighted search, boosts
 		List<Boost> boostList = new ArrayList<Boost>();
-		boostList.add(new Boost('b', 50));
-		boostList.add(new Boost('q', 100));
-		System.out.println(trie.weightedSearch(2, "b", 2, boostList));
+		boostList.add(new Boost("board", 50));
+		boostList.add(new Boost("question", 100));
+		boostList.add(new Boost("e3", 51));
+		System.out.println(trie.weightedSearch(4, "b", 3, boostList));
 		//trie.remove2("e3"); //TODO - needs to be changed so just uses ID
 
 		//System.out.printf("After remove...\n%s\n", trie);
