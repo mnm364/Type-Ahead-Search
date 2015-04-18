@@ -906,9 +906,7 @@ public class CompressedHashTrie {
 		char charNull = '\u0000';
 		char firstLetter = charNull, secondLetter = charNull;
 		while (!foundDiff) {
-			System.out.println("l:" + first.length());
 			if (i < first.length()) {
-				System.out.println(i + " " + first);
 				firstLetter = first.charAt(i);// + "";
 			}
 
