@@ -3,6 +3,8 @@
  * ^^string?
  * -midstring compression is not implemented yet
  * ^^b/c of this, inputting same string in twice will make the whole string single chars.. :(
+
+ * Change entries to hash b/c of constant lookup time
  */
 
 import java.util.ArrayList;
@@ -71,6 +73,10 @@ public class CompressedHashTrie {
 			return (Entry) entries.getVal(0);
 		}
 
+		private void setChildNull() {
+			this.child = null;
+		}
+
 		/**
 		 * Checks to see if first letter of val is equal
 		 *
@@ -117,6 +123,41 @@ public class CompressedHashTrie {
 			return this.hashCode();
 		}
 
+	}
+
+	//if this works, it should be combined with TrieHashNode, no need for inheritence
+	private class TrieSeqHash extends TrieHashNode {
+		/* ASCII character data */
+		private ByteArrayCharSequence val;
+
+		private TrieSeqHash(String val, CompressedHashTrie child, Entry e) {
+			super(child, e);
+			this.val = new ByteArrayCharSequence(val);
+		}
+
+		private TrieSeqHash(ByteArrayCharSequence val, CompressedHashTrie child, Entry e) {
+			super(child, e);
+			this.val = val;
+		}
+
+		private void changeStr(ByteArrayCharSequence seq) {
+			this.val = seq;
+		}
+
+		private ByteArrayCharSequence getVal() {
+			return val;
+		}
+
+		@Override
+		public String toString() {
+			return "(" + this.val.toString() + ":" + this.entries + ")" + "isLeaf:" + this.leaf;
+		}
+
+		@Override
+		public int hashCode() {
+			Character c = new Character(val.charAt(0));
+			return c.hashCode();
+		}
 	}
 
 	/**
@@ -226,6 +267,62 @@ public class CompressedHashTrie {
 			allEntries.add(e);
 			this.insert4(new TrieStrHash(words[i], null, e));
 		}
+	}
+
+	public void insert5(Entry e) {
+		//TODO - split at commas, punctuation marks, etc.
+		String words[] = e.getDataStr().toLowerCase().split("\\s+");
+
+		/* insert individual words into trie */
+		for (int i = 0; i < words.length; i++) {
+			System.out.printf("- insert %s:{%s}\n", words[i],e);
+			allEntries.add(e);
+			this.insert5(new TrieSeqHash(words[i], null, e));
+		}
+	}
+	private boolean insert5(TrieHashNode seqNode) {
+		//boolean putSuccess = this.root.put(seqNode);
+		TrieHashNode tempNode = this.root.get(seqNode);
+
+		//The first letter of seqNode is already in the hash map
+		if (tempNode != null) {
+
+			if (tempNode.child == null) {
+				tempNode.child = new CompressedHashTrie();
+			}
+
+			if (tempNode instanceof TrieSeqHash && seqNode instanceof TrieSeqHash) {
+				TrieSeqHash tempSeqHash = (TrieSeqHash) tempNode;
+				ByteArrayCharSequence value = tempSeqHash.getVal();
+				tempSeqHash.leaf = false;
+				TrieSeqHash newSeqNode = (TrieSeqHash) seqNode;
+
+				int index = compress(value, newSeqNode.val);
+
+				tempSeqHash.changeStr(value.subSequence(0, index));
+
+				Set<Entry> entries = newSeqNode.entries;
+				for (int i = 0; i < entries.size(); i++) {
+					tempSeqHash.addEntry((Entry)entries.getVal(i));
+				}
+
+				if (value.length() > index) {
+					TrieSeqHash tempSeqHashShorter = new TrieSeqHash(value.subSequence(index), null, 
+							tempSeqHash.getFirstEntry());
+					tempSeqHashShorter.leaf = true;
+					tempSeqHash.child.insert4(tempSeqHashShorter);	
+				}
+
+				if (newSeqNode.getVal().length() > index) {
+					newSeqNode.changeStr(newSeqNode.getVal().subSequence(index));
+					newSeqNode.leaf = true;
+					tempSeqHash.child.insert4(newSeqNode);
+				}
+			}
+		} else { //data doesn't exist in hash map yet
+			this.root.put(seqNode);
+		}
+		return true;
 	}
 
 	private boolean insert4(TrieHashNode strNode) {
@@ -399,7 +496,6 @@ public class CompressedHashTrie {
 		return false;
 	}
 
-
 	/**
 	 * Inserts a single string into the trie.
 	 * 
@@ -507,6 +603,122 @@ public class CompressedHashTrie {
 		return false;
 	}
 
+
+	public boolean remove3(String id) {
+		int index = this.allEntries.search(id);
+
+		if (index != -1) {
+			Entry tempEntry = (Entry) this.allEntries.getVal(index);
+			String words[] = tempEntry.getDataStr().toLowerCase().split("\\s+");
+			for (int i = 0; i < words.length; i++) {
+				TrieHashNode tempNode = this.root.get(new TrieSeqHash(words[i], null, null));
+				if (tempNode != null) {
+					this.remove3(tempNode, new ByteArrayCharSequence(words[i]), id);
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
+	private boolean remove3(TrieHashNode tempNode, ByteArrayCharSequence seq, String id) {
+
+		//Only expecting TrieSeqHashes...
+		if (tempNode instanceof TrieSeqHash) {
+			TrieSeqHash tempSeqNode = (TrieSeqHash) tempNode;
+			Set<Entry> entries = tempSeqNode.entries;
+
+			if (tempSeqNode.child != null) {
+				ByteArrayCharSequence value = tempSeqNode.getVal();
+
+				int index = compress(value, seq);
+
+				seq = seq.subSequence(index);
+				TrieHashNode tempHashNode = null;
+				if (seq.length() > 0) {
+					tempHashNode = tempSeqNode.child.root.get(new TrieSeqHash(seq, null, null));
+				}
+
+				if (tempHashNode != null) {
+					if (tempHashNode.isLeaf()){
+						//if the node is a leaf, it is safe to remove it
+						tempSeqNode.child.root.remove(tempHashNode);
+						if (tempSeqNode.child.root.size() == 0) {
+							//setting the node to a leaf
+							tempSeqNode.leaf = true;
+						} 
+
+						if (tempSeqNode.child.root.size() == 1) {
+							//recompression
+							Iterator<TrieHashNode> it = tempSeqNode.child.root.iterator();
+							TrieSeqHash theOtherChild = null; 
+							if (it.hasNext()) {
+								theOtherChild = (TrieSeqHash) it.next();
+							}
+							this.pullNodesUp(tempSeqNode, theOtherChild);
+						}
+
+					}
+					this.remove3(tempHashNode, seq, id);
+				}
+			}
+
+			entries.remove(id);
+		}
+
+		//does this method ever return true?
+		return false;
+	}
+
+	private boolean remove(TrieHashNode tempNode, String str, String id) {
+
+		if (tempNode instanceof TrieStrHash) {
+			TrieStrHash tempStrNode = (TrieStrHash) tempNode;
+			Set<Entry> entries = tempStrNode.entries;
+
+			if (entries.size() > 1) {
+				if (tempStrNode.child != null && str.length() > 1) {
+					String value = tempStrNode.getVal();
+					str = str.substring(str.indexOf(value.charAt(value.length()-1)));
+
+					TrieHashNode tempHashNode = tempStrNode.child.root.get(new TrieStrHash(str, null, null));
+					if (tempHashNode != null) {
+						if (tempHashNode.entries.size() == 1) {
+							tempStrNode.child.root.remove(tempHashNode);
+						}
+						this.remove(tempHashNode, str, id);
+					}
+				}
+			}
+			entries.remove(id);
+
+		} else {
+			TrieCharHash tempCharNode = (TrieCharHash) tempNode;
+
+			Set<Entry> entries = tempCharNode.entries;
+
+			if (entries.size() > 1) {
+				if (str.length() > 1) {
+					str = str.substring(1);
+				}
+
+				if (tempCharNode.child != null) {
+					TrieHashNode tempHashNode = tempCharNode.child.root.get(new TrieStrHash(str, null, null));
+					if (tempHashNode != null) {
+						if (tempHashNode.entries.size() == 1) {
+							tempCharNode.child.root.remove(tempHashNode);
+						}
+						this.remove(tempHashNode, str, id);
+					}
+				}
+			}
+			entries.remove(id);
+
+		}
+
+		return false;
+	}
+
 	/**
 	 * Removes string from trie, two different uses.
 	 * 	1) If string is non-unique or a prefix to another string, just remove id from ref list.
@@ -520,7 +732,6 @@ public class CompressedHashTrie {
 	 * @return true if removed string; false otherwise
 	 */
 	public boolean remove(String str, String id) {
-		//	TODO - method stub
 		String words[] = str.toLowerCase().split("\\s+");
 
 		for (int i = 0; i < words.length; i++) {
@@ -627,55 +838,6 @@ public class CompressedHashTrie {
 
 	}
 
-	private boolean remove(TrieHashNode tempNode, String str, String id) {
-
-		if (tempNode instanceof TrieStrHash) {
-			TrieStrHash tempStrNode = (TrieStrHash) tempNode;
-			Set<Entry> entries = tempStrNode.entries;
-
-			if (entries.size() > 1) {
-				if (tempStrNode.child != null && str.length() > 1) {
-					String value = tempStrNode.getVal();
-					str = str.substring(str.indexOf(value.charAt(value.length()-1)));
-
-					TrieHashNode tempHashNode = tempStrNode.child.root.get(new TrieStrHash(str, null, null));
-					if (tempHashNode != null) {
-						if (tempHashNode.entries.size() == 1) {
-							tempStrNode.child.root.remove(tempHashNode);
-						}
-						this.remove(tempHashNode, str, id);
-					}
-				}
-			}
-			entries.remove(id);
-
-		} else {
-			TrieCharHash tempCharNode = (TrieCharHash) tempNode;
-
-			Set<Entry> entries = tempCharNode.entries;
-
-			if (entries.size() > 1) {
-				if (str.length() > 1) {
-					str = str.substring(1);
-				}
-
-				if (tempCharNode.child != null) {
-					TrieHashNode tempHashNode = tempCharNode.child.root.get(new TrieStrHash(str, null, null));
-					if (tempHashNode != null) {
-						if (tempHashNode.entries.size() == 1) {
-							tempCharNode.child.root.remove(tempHashNode);
-						}
-						this.remove(tempHashNode, str, id);
-					}
-				}
-			}
-			entries.remove(id);
-
-		}
-
-		return false;
-	}
-
 	/**
 	 * This method gets two strings as input and finds the
 	 * index of the first character that is different between
@@ -713,7 +875,39 @@ public class CompressedHashTrie {
 		}
 		return i;
 	}
-	
+
+	//using ByteArrayCharSequence
+	private int compress(ByteArrayCharSequence first, ByteArrayCharSequence second) {
+		int i = 0, j = 0;
+		boolean foundDiff = false;
+		char charNull = '\u0000';
+		char firstLetter = charNull, secondLetter = charNull;
+		while (!foundDiff) {
+			if (i < first.length()) {
+				firstLetter = first.charAt(i);// + "";
+			}
+
+			if (j < second.length()) {
+				secondLetter = second.charAt(j);// + "";
+			}
+
+			if (firstLetter == charNull || secondLetter == charNull){
+				foundDiff = true;
+				if (i > j) {
+					i = j;
+				}
+			} else if (firstLetter != secondLetter) {
+				foundDiff = true;
+			} else {
+				i++;
+				j++;
+				firstLetter = charNull;
+				secondLetter = charNull;
+			}
+		}
+		return i;
+	}
+
 	/*
 	private int compress(String first, String second) {
 		
@@ -959,26 +1153,35 @@ public class CompressedHashTrie {
 		
 		Entry e0 = new Entry("e" + Integer.toString(0), 'u', 10, words[0]);
 		System.out.printf("ENTRY #%d\n", 0);
-		trie.insert(e0);
+		trie.insert5(e0);
 		
+		System.out.printf("\n0%s\n", trie);
+		trie.breadthFirstTraversal(trie);
+
 		Entry e1 = new Entry("e" + Integer.toString(1), 't', 10, words[1]);
 		System.out.printf("ENTRY #%d\n", 1);
 		trie.insert(e1);
 		
+		System.out.printf("\n1%s\n", trie);
+		trie.breadthFirstTraversal(trie);
+
 		Entry e2 = new Entry("e" + Integer.toString(2), 'q', 10, words[2]);
 		System.out.printf("ENTRY #%d\n", 2);
 		trie.insert(e2);
 		
+		System.out.printf("\n2%s\n", trie);
+		trie.breadthFirstTraversal(trie);
+
 		Entry e3 = new Entry("e" + Integer.toString(3), 'b', 10, words[3]);
 		System.out.printf("ENTRY #%d\n", 3);
 		trie.insert(e3);
 
-		System.out.printf("\n%s\n", trie);
+		System.out.printf("\n3%s\n", trie);
 		trie.breadthFirstTraversal(trie);
 
 		//normal search
 		System.out.println(trie.search(3, "b"));
-		
+
 		//weighted search, no boosts
 		System.out.println(trie.weightedSearch(2, "b", 0, null));
 		
@@ -1000,5 +1203,6 @@ public class CompressedHashTrie {
 		System.out.println(empty.hashCode());
 		ByteArrayCharSequence cseq_c = cseq.subSequence(0, cseq.length()-1);
 		System.out.println(cseq.equals(cseq_c)); //should be true
+		System.out.println(cseq.subSequence(1,4).subSequence(2)); //should print "e"
 	}
 }

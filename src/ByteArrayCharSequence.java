@@ -2,13 +2,17 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 
 public class ByteArrayCharSequence implements CharSequence, Serializable {
-	private static final long serialVersionUID = 042105;
+	private static final long serialVersionUID = 042015;
 	private static final String ENCODING = "US-ASCII";
 
 	private final byte[] data;
 	private final int offset;
 	private final int end;
 
+	/**
+	 * Constructor to create ByteArrayCharSequence from String.
+	 * @param str string to create ByteArrayCharSequence from
+	 */
 	public ByteArrayCharSequence(String str) {
 		try {
 			data = str.getBytes(ENCODING);
@@ -19,6 +23,12 @@ public class ByteArrayCharSequence implements CharSequence, Serializable {
 		}
 	}
 
+	/**
+	 * Constructor to create ByteArrayCharSequence from byte array.
+	 * @param data the byte array
+	 * @param offset start index in array to create sequence
+	 * @param end end index in array to create sequence
+	 */
 	private ByteArrayCharSequence(byte[] data, int offset, int end) {
 		this.data = data;
 		this.offset = offset;
@@ -31,6 +41,14 @@ public class ByteArrayCharSequence implements CharSequence, Serializable {
 				start + "-" + end + " for sequence of length " + length());
 		}
 		return new ByteArrayCharSequence(data, start + offset, end + offset);
+	}
+
+	public ByteArrayCharSequence subSequence(int start) {
+		if (start < 0 || start >= (this.end - offset)) {
+			throw new IllegalArgumentException("Illegal range " +
+				end + "-" + (this.end - offset) + " for sequence of length " + length()); 
+		}
+		return new ByteArrayCharSequence(data, start + offset, this.end + offset);
 	}
 
 	public char charAt(int index) {
@@ -55,12 +73,13 @@ public class ByteArrayCharSequence implements CharSequence, Serializable {
 		}
 	}
 
+	//not really needed...
 	@Override
 	public int hashCode() {
 		if (this.length() == 0) {
 			return 0;
 		}
-		return data[0]; //specific for this implementation
+		return this.toString().hashCode();
 	}
 
 	@Override

@@ -99,17 +99,18 @@ public class DoubleHashedHashMap<K> implements Iterable<K> {
 			//Item not in hash map
 			int hashValue = key.hashCode() % this.hashMap.length;
 			
+			//TODO - can this ever happen?
 			if (hashValue < 0) {
 				hashValue *= -1;
 			}
-			
+
 			boolean inserted = false;
-			
+
 			int index = hashValue;
 			
 			while(!inserted) {
 				K tempKey = this.hashMap[index];
-				
+
 				if (tempKey == null) {
 					this.hashMap[index] = key;
 					this.size++;
@@ -118,14 +119,14 @@ public class DoubleHashedHashMap<K> implements Iterable<K> {
 					index = (index + secondHashFunction(tempKey)) % this.hashMap.length;
 				}
 			}
-			
+
 			double tempLoadFactor = (double) this.size / this.hashMap.length;
 			//System.out.println("Temp Load Factor: " + tempLoadFactor);
 			if (tempLoadFactor >= this.loadFactor) {
 				//System.out.println("Going to rehash");
 				this.rehash();
 			}
-			
+
 			return true;
 		} else {
 			//Item already in hash map
@@ -210,28 +211,31 @@ public class DoubleHashedHashMap<K> implements Iterable<K> {
 		if (key != null) {
 			value = key.hashCode() % this.hashMap.length;
 			
+			//TODO - how could this ever happen?
 			if (value < 0) {
 				value *= -1;
 			}
 		}
-		
+
 		int index = value;
-		
+
 		do {
 			K tempKey = this.hashMap[index];
-			
+
 			if (tempKey == null) {
 				return -1;
 			} else if (key.equals(tempKey)) {
 				return index;
 			}
-			
-			index = (index + secondHashFunction(tempKey)) % this.hashMap.length;
-			
+
+			//TODO - right now this is just linear collision resolution
+			index = (index + secondHashFunction(tempKey)) % this.hashMap.length; 
+
 		} while (index != value);
+
 		return -1;
 	}
-	
+
 	/**
 	 * This is the second hash function for the class.
 	 * @param key the key 
