@@ -134,7 +134,7 @@ public class Set<T> {
 	 * @param o
 	 * @return index of object being searched for
 	 */
-	private int search(final Object o) {
+	public int search(final Object o) {
         for (int i = 0; i < size; i++) {
             if (this.theSet[i].equals(o)) {
                 return i;
