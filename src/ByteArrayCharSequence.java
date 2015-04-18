@@ -36,7 +36,7 @@ public class ByteArrayCharSequence implements CharSequence, Serializable {
 	}
 
 	public ByteArrayCharSequence subSequence(int start, int end) {
-		if (start < 0 || end >= (this.end-offset)) {
+		if (start < 0 || end > (this.end-offset)) {
 			throw new IllegalArgumentException("Illegal range " +
 				start + "-" + end + " for sequence of length " + length());
 		}
@@ -44,7 +44,7 @@ public class ByteArrayCharSequence implements CharSequence, Serializable {
 	}
 
 	public ByteArrayCharSequence subSequence(int start) {
-		if (start < 0 || start >= (this.end - offset)) {
+		if (start < 0 || start > (this.end - offset)) {
 			throw new IllegalArgumentException("Illegal range " +
 				end + "-" + (this.end - offset) + " for sequence of length " + length()); 
 		}

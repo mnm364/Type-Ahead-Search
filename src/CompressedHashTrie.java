@@ -95,8 +95,11 @@ public class CompressedHashTrie {
 				} else if (o instanceof TrieCharHash) {
 					TrieCharHash that = (TrieCharHash) o;
 					return _this.val.charAt(0) == that.val;
+				} else if (o instanceof TrieSeqHash){
+					TrieSeqHash that = (TrieSeqHash) o;
+					return _this.val.charAt(0) == that.val.charAt(0);
 				} else {
-					//dont care...
+					//dont care
 					return false;
 				}
 			} else if (this instanceof TrieCharHash) {
@@ -107,12 +110,30 @@ public class CompressedHashTrie {
 				} else if (o instanceof TrieCharHash) {
 					TrieCharHash that = (TrieCharHash) o;
 					return _this.val == that.val;
+				} else if (o instanceof TrieSeqHash){
+					TrieSeqHash that = (TrieSeqHash) o;
+					return _this.val == that.val.charAt(0);
 				} else {
-					//dont care...
+					//dont care
+					return false;
+				}
+			} else if (this instanceof TrieSeqHash){
+				TrieSeqHash _this = (TrieSeqHash) this;
+				if (o instanceof TrieStrHash) {
+					TrieStrHash that = (TrieStrHash) o;
+					return _this.val.charAt(0) == that.val.charAt(0);
+				} else if (o instanceof TrieCharHash) {
+					TrieCharHash that = (TrieCharHash) o;
+					return _this.val.charAt(0) == that.val;
+				} else if (o instanceof TrieSeqHash){
+					TrieSeqHash that = (TrieSeqHash) o;
+					return _this.val.charAt(0) == that.val.charAt(0);
+				} else {
+					//dont care
 					return false;
 				}
 			} else {
-				//dont care...
+				//dont care
 				return false;
 			}
 		}
@@ -310,17 +331,18 @@ public class CompressedHashTrie {
 					TrieSeqHash tempSeqHashShorter = new TrieSeqHash(value.subSequence(index), null, 
 							tempSeqHash.getFirstEntry());
 					tempSeqHashShorter.leaf = true;
-					tempSeqHash.child.insert4(tempSeqHashShorter);	
+					tempSeqHash.child.insert5(tempSeqHashShorter);	
 				}
 
 				if (newSeqNode.getVal().length() > index) {
 					newSeqNode.changeStr(newSeqNode.getVal().subSequence(index));
 					newSeqNode.leaf = true;
-					tempSeqHash.child.insert4(newSeqNode);
+					tempSeqHash.child.insert5(newSeqNode);
 				}
 			}
 		} else { //data doesn't exist in hash map yet
 			this.root.put(seqNode);
+			seqNode.leaf = true;
 		}
 		return true;
 	}
@@ -368,6 +390,7 @@ public class CompressedHashTrie {
 		} else {
 			//doesnt exist in hash map yet
 			this.root.put(strNode);
+			strNode.leaf = true;
 		}
 
 		return true;
@@ -1160,37 +1183,37 @@ public class CompressedHashTrie {
 
 		Entry e1 = new Entry("e" + Integer.toString(1), 't', 10, words[1]);
 		System.out.printf("ENTRY #%d\n", 1);
-		trie.insert(e1);
+		trie.insert5(e1);
 		
 		System.out.printf("\n1%s\n", trie);
 		trie.breadthFirstTraversal(trie);
 
 		Entry e2 = new Entry("e" + Integer.toString(2), 'q', 10, words[2]);
 		System.out.printf("ENTRY #%d\n", 2);
-		trie.insert(e2);
+		trie.insert5(e2);
 		
 		System.out.printf("\n2%s\n", trie);
 		trie.breadthFirstTraversal(trie);
 
 		Entry e3 = new Entry("e" + Integer.toString(3), 'b', 10, words[3]);
 		System.out.printf("ENTRY #%d\n", 3);
-		trie.insert(e3);
+		trie.insert5(e3);
 
 		System.out.printf("\n3%s\n", trie);
 		trie.breadthFirstTraversal(trie);
 
 		//normal search
-		System.out.println(trie.search(3, "b"));
+//		System.out.println(trie.search(3, "b"));
 
 		//weighted search, no boosts
-		System.out.println(trie.weightedSearch(2, "b", 0, null));
+//		System.out.println(trie.weightedSearch(2, "b", 0, null));
 		
 		//weighted search, boosts
-		List<Boost> boostList = new ArrayList<Boost>();
+		/*List<Boost> boostList = new ArrayList<Boost>();
 		boostList.add(new Boost("board", 50));
 		boostList.add(new Boost("question", 100));
 		boostList.add(new Boost("e3", 51));
-		System.out.println(trie.weightedSearch(4, "b", 3, boostList));
+		System.out.println(trie.weightedSearch(4, "b", 3, boostList));*/
 		//trie.remove2("e3"); //TODO - needs to be changed so just uses ID
 
 		//System.out.printf("After remove...\n%s\n", trie);
