@@ -171,7 +171,7 @@ public class CompressedHashTrie {
 
 		@Override
 		public String toString() {
-			return "(" + this.val.toString() + ":" + this.entries + ")" + "isLeaf:" + this.leaf;
+			return "SEQ(" + this.val.toString() + ":" + this.entries + ")" + "isLeaf:" + this.leaf;
 		}
 
 		@Override
@@ -331,7 +331,7 @@ public class CompressedHashTrie {
 					TrieSeqHash tempSeqHashShorter = new TrieSeqHash(value.subSequence(index), null, 
 							tempSeqHash.getFirstEntry());
 					tempSeqHashShorter.leaf = true;
-					tempSeqHash.child.insert5(tempSeqHashShorter);	
+					tempSeqHash.child.insert5(tempSeqHashShorter);
 				}
 
 				if (newSeqNode.getVal().length() > index) {
@@ -906,7 +906,9 @@ public class CompressedHashTrie {
 		char charNull = '\u0000';
 		char firstLetter = charNull, secondLetter = charNull;
 		while (!foundDiff) {
+			System.out.println("l:" + first.length());
 			if (i < first.length()) {
+				System.out.println(i + " " + first);
 				firstLetter = first.charAt(i);// + "";
 			}
 
@@ -963,7 +965,7 @@ public class CompressedHashTrie {
 				idList.add(entryList.get(i).getId());
 			}
 		}
-		
+
 		return idList;
 	}
 	
@@ -982,7 +984,7 @@ public class CompressedHashTrie {
 			TrieStrHash temp = new TrieStrHash(words[i], null, null);
 			this.search(temp, map);
 		}
-		
+
 		Iterator<QueryEntry> iterator = map.iterator();
 		while(iterator.hasNext()) {
 			QueryEntry tempEntry = iterator.next();
@@ -992,7 +994,7 @@ public class CompressedHashTrie {
 				idList.add(tempEntry.getEntry());
 			}
 		}
-		
+
 		return idList;
 	}
 	
@@ -1173,11 +1175,11 @@ public class CompressedHashTrie {
 			System.out.printf("ENTRY #%d\n", i);
 			trie.insert(e);
 		}*/
-		
+
 		Entry e0 = new Entry("e" + Integer.toString(0), 'u', 10, words[0]);
 		System.out.printf("ENTRY #%d\n", 0);
-		trie.insert(e0);
-		
+		trie.insert5(e0);
+
 		System.out.printf("\n0%s\n", trie);
 		trie.breadthFirstTraversal(trie);
 

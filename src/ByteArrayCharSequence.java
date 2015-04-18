@@ -44,18 +44,18 @@ public class ByteArrayCharSequence implements CharSequence, Serializable {
 	}
 
 	public ByteArrayCharSequence subSequence(int start) {
-		if (start < 0 || start > (this.end - offset)) {
+		if (start < 0 || start > (end - offset)) {
 			throw new IllegalArgumentException("Illegal range " +
 				end + "-" + (this.end - offset) + " for sequence of length " + length()); 
 		}
-		return new ByteArrayCharSequence(data, start + offset, this.end + offset);
+		return new ByteArrayCharSequence(data, start + offset, end);
 	}
 
 	public char charAt(int index) {
 		int ix = index + offset;
 		if (ix >= end) {
 			throw new StringIndexOutOfBoundsException("Invalid index" + 
-				index + "length " + length());
+				index + " length " + length());
 		}
 		return (char) (data[ix] & 0xff);
 	}
