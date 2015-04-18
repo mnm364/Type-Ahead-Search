@@ -36,7 +36,7 @@ public class Boost implements Comparable<Boost>{
 	@Override
 	public int compareTo(Boost obj) {
 		if (getClass() == obj.getClass()) {
-			Boost other = (Boost) obj;
+			Boost other = (Boost) obj; //TODO - warning here
 			if (other.boostValue > this.boostValue) {
 				return 1;
 			} else if (other.boostValue < this.boostValue) {

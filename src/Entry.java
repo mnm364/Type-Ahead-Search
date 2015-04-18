@@ -92,7 +92,7 @@ public class Entry implements Comparable<Entry>{
 	@Override
 	public int compareTo(Entry obj) {
 		if (getClass() == obj.getClass()) {
-			Entry other = (Entry) obj;
+			Entry other = (Entry) obj; //TODO - warning here
 			if (other.score > this.score) {
 				return 1;
 			} else if (other.score < this.score) {

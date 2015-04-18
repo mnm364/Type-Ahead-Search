@@ -74,6 +74,7 @@ public class CompressedHashTrie {
 		 */
 		//TODO - IS THERE A BETTER WAY TO PERFORM THIS CHECK?!!!? seems pretty expensive...
 		//^^yes... make DoubleHashedHashMap not generic so it can deal with this directly...?
+		//TODO - possibly use getClass() for better performance? not sure...
 		@Override
 		public boolean equals(Object o) {
 			//TrieHashNode that = (TrieHashNode) o;
@@ -710,12 +711,7 @@ public class CompressedHashTrie {
 		return i;
 	}
 	
-	/**
-	 * This method searches for the queryString in the map
-	 * @param numberOfResults The number of results wanted
-	 * @param queryString The query string
-	 * @return A list of strings of ids
-	 */
+	/*
 	private int compress(String first, String second) {
 		
 		for (int i = 0; i < first.length() && i < second.length(); i++) {
@@ -729,7 +725,14 @@ public class CompressedHashTrie {
 
 		return -1;
 	}
-
+	*/
+	
+	/**
+	 * This method searches for the queryString in the map
+	 * @param numberOfResults The number of results wanted
+	 * @param queryString The query string
+	 * @return A list of strings of ids
+	 */
 	public List<String> search(int numberOfResults, String queryString) {
 		ArrayList<Entry> entryList = (ArrayList<Entry>) genericSearch(queryString);
 		Collections.sort(entryList);
