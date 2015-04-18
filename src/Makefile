@@ -8,7 +8,8 @@ CLASSES = \
 	CompressedHashTrie.java \
 	DoubleHashedHashMap.java \
 	Entry.java \
-	Set.java
+	Set.java \
+	ByteArrayCharSequence.java
 
 default: classes
 

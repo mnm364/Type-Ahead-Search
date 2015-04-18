@@ -218,6 +218,9 @@ public class CompressedHashTrie {
 		}
 	}
 	
+
+
+
 	/**
 	 * This method inserts a new TrieStrHash object into the CompressedHashTrie.
 	 * It also almost correctly keeps track of the entries that are in the root node.
@@ -528,9 +531,18 @@ public class CompressedHashTrie {
 	 * 
 	 * @return true if compression happened; otherwise, false
 	 */
-	private boolean compress() {
-		//TODO - method stub
-		return false;
+	private int compress(String first, String second) {
+		
+		for (int i = 0; i < first.length() && i < second.length(); i++) {
+			char firstChar = first.charAt(i);
+			char secondChar = second.charAt(i);
+
+			if (firstChar != secondChar) {
+				return i - 1;
+			}
+		}
+
+		return -1;
 	}
 
 	//Breadth first traversal of trie
