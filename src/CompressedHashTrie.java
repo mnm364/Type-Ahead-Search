@@ -1153,7 +1153,7 @@ public class CompressedHashTrie {
 		
 		Entry e0 = new Entry("e" + Integer.toString(0), 'u', 10, words[0]);
 		System.out.printf("ENTRY #%d\n", 0);
-		trie.insert5(e0);
+		trie.insert(e0);
 		
 		System.out.printf("\n0%s\n", trie);
 		trie.breadthFirstTraversal(trie);
