@@ -9,6 +9,8 @@ CLASSES = \
 	DoubleHashedHashMap.java \
 	Entry.java \
 	Set.java \
+	Boost.java \
+	QueryEntry.java \
 	ByteArrayCharSequence.java
 
 default: classes

@@ -24,9 +24,9 @@ public class CompressedHashTrie {
 	private DoubleHashedHashMap<TrieHashNode> root;
 
 	private Set<Entry> allEntries;
+	
 	/**
-	 * 
-	 *
+	 * Nodes to be stored in the hashes in the trie
 	 */
 	private class TrieHashNode {
 		/* Boolean to mark leaf nodes. */
@@ -36,18 +36,21 @@ public class CompressedHashTrie {
 		protected CompressedHashTrie child;
 
 		//	TODO - make this list of references to entries
-		//	TODO - make this a skip list data structure (JEFF SAID WE DONT NEED THIS...?)
+		//	TODO - make this a skip list data structure (or a hashMap so constant lookup time)
 		/* list of object references to unordered master Set */
 		protected Set<Entry> entries;
 
 		/**
-		 * Determine if got is leaf or not.
+		 * Determine if leaf or not.
 		 * @return true if leaf; false otherwise
 		 */
 		protected boolean isLeaf() {
 			return leaf;
 		}
 
+		/**
+		 * Constructor for hashnode
+		 */
 		private TrieHashNode(CompressedHashTrie child, Entry e) {
 			child = new CompressedHashTrie();
 			entries = new Set<Entry>();
@@ -595,8 +598,8 @@ public class CompressedHashTrie {
 	/**
 	 * This method pulls up the child's children and make them children of the parent.
 	 * It then changes the parent's data string to accommodate and removes the child.
-	 * @param parent The parent node
-	 * @param child The child node
+	 * @param parent the parent node
+	 * @param child the child node
 	 */
 	private void pullNodesUp(TrieHashNode parent, TrieHashNode child) {
 
@@ -726,7 +729,7 @@ public class CompressedHashTrie {
 		return -1;
 	}
 	*/
-	
+
 	/**
 	 * This method searches for the queryString in the map
 	 * @param numberOfResults The number of results wanted
@@ -990,8 +993,12 @@ public class CompressedHashTrie {
 		//System.out.printf("After remove...\n%s\n", trie);
 		//trie.breadthFirstTraversal(trie);
 
-
-
-
+		//testing ByteArrayCharSequence stuff
+		ByteArrayCharSequence cseq = new ByteArrayCharSequence("byte array, yay!");
+		System.out.println(cseq.subSequence(0,3).hashCode());
+		ByteArrayCharSequence empty = new ByteArrayCharSequence("");
+		System.out.println(empty.hashCode());
+		ByteArrayCharSequence cseq_c = cseq.subSequence(0, cseq.length()-1);
+		System.out.println(cseq.equals(cseq_c)); //should be true
 	}
 }

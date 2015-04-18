@@ -57,15 +57,25 @@ public class ByteArrayCharSequence implements CharSequence, Serializable {
 
 	@Override
 	public int hashCode() {
-		return data[0];
+		if (this.length() == 0) {
+			return 0;
+		}
+		return data[0]; //specific for this implementation
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		if (o instanceof ByteArrayCharSequence) {
-			return true; //fix this
+		if (o instanceof ByteArrayCharSequence) { //should I use getClass() instead?
+			ByteArrayCharSequence that = (ByteArrayCharSequence) o;
+			if (this.length() == that.length()) {
+				for (int i = 0; i < this.length(); i++) {
+					if (this.charAt(i) != that.charAt(i)) {
+						return false;
+					}
+				}
+				return true;
+			}
 		}
 		return false;
-
 	}
 }
