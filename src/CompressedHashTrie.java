@@ -44,7 +44,8 @@ public class CompressedHashTrie {
 
 		/* Boolean to mark leaf nodes. */
 		protected boolean leaf;
-//TODO unneccssarry parameters (child)
+
+		//TODO unneccssarry parameters (child)
 		/**
 		 * Constructor for hash node in compressed trie.
 		 * @param child child trie hashmap of node
@@ -1524,6 +1525,9 @@ public class CompressedHashTrie {
 
 		System.out.printf("\n3%s\n", trie);
 		trie.breadthFirstTraversal(trie);
+
+		System.out.println("REMOVING STUFF");
+		
 
 		//normal search
 //		System.out.println(trie.search(3, "b"));
