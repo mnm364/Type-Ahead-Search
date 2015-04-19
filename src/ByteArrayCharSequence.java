@@ -35,6 +35,12 @@ public class ByteArrayCharSequence implements CharSequence, Serializable {
 		this.end = end;
 	}
 
+	/**
+	 * Create subsequence of byte array from given start to given end.
+	 * @param start start index
+	 * @param end end index
+	 * @return the subsequence
+	 */
 	public ByteArrayCharSequence subSequence(int start, int end) {
 		if (start < 0 || end > (this.end-offset)) {
 			throw new IllegalArgumentException("Illegal range " +
@@ -43,14 +49,32 @@ public class ByteArrayCharSequence implements CharSequence, Serializable {
 		return new ByteArrayCharSequence(data, start + offset, end + offset);
 	}
 
+	/**
+	 * Create subsequence of byte array from given start to end.
+	 * @param start start index
+	 * @return the subsequence
+	 */
 	public ByteArrayCharSequence subSequence(int start) {
+		//return this.subSequence(start, this.end);
 		if (start < 0 || start > (end - offset)) {
 			throw new IllegalArgumentException("Illegal range " +
 				end + "-" + (this.end - offset) + " for sequence of length " + length()); 
 		}
-		return new ByteArrayCharSequence(data, start + offset, end);
+		return new ByteArrayCharSequence(data, start + offset, this.end);
 	}
 
+	public ByteArrayCharSequence append(ByteArrayCharSequence bar) {
+		byte[] n = new byte[this.length() + bar.length()];
+		System.arraycopy(this.data, 0, n, 0, this.length());
+		System.arraycopy(bar.getData(), 0, n, this.length(), bar.length());
+		return new ByteArrayCharSequence(n, this.offset, this.end + bar.length());
+	}
+
+	/**
+	 * Get char at given index from byte array.
+	 * @param index the index to get the char from
+	 * @return the char at the indicated index
+	 */
 	public char charAt(int index) {
 		int ix = index + offset;
 		if (ix >= end) {
@@ -60,8 +84,16 @@ public class ByteArrayCharSequence implements CharSequence, Serializable {
 		return (char) (data[ix] & 0xff);
 	}
 
+	/**
+	 * Get length of the subsequence.
+	 * @return the length
+	 */
 	public int length() {
 		return end - offset;
+	}
+
+	public byte[] getData() {
+		return this.data;
 	}
 
 	@Override
@@ -73,18 +105,9 @@ public class ByteArrayCharSequence implements CharSequence, Serializable {
 		}
 	}
 
-	//not really needed...
-	@Override
-	public int hashCode() {
-		if (this.length() == 0) {
-			return 0;
-		}
-		return this.toString().hashCode();
-	}
-
 	@Override
 	public boolean equals(Object o) {
-		if (o instanceof ByteArrayCharSequence) { //should I use getClass() instead?
+		if (o instanceof ByteArrayCharSequence) { //TODO - should I use getClass() instead?
 			ByteArrayCharSequence that = (ByteArrayCharSequence) o;
 			if (this.length() == that.length()) {
 				for (int i = 0; i < this.length(); i++) {
@@ -96,5 +119,14 @@ public class ByteArrayCharSequence implements CharSequence, Serializable {
 			}
 		}
 		return false;
+	}
+
+	//not really needed...
+	@Override
+	public int hashCode() {
+		if (this.length() == 0) {
+			return 0;
+		}
+		return this.toString().hashCode();
 	}
 }
