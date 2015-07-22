@@ -1527,7 +1527,7 @@ public class CompressedHashTrie {
 		trie.breadthFirstTraversal(trie);
 
 		System.out.println("REMOVING STUFF");
-		
+
 
 		//normal search
 //		System.out.println(trie.search(3, "b"));
@@ -1551,8 +1551,7 @@ public class CompressedHashTrie {
 		System.out.println(cseq.subSequence(0,3).hashCode());
 		ByteArrayCharSequence empty = new ByteArrayCharSequence("");
 		System.out.println(empty.hashCode());
-		ByteArrayCharSequence cseq_c = cseq.subSequence(0, cseq.length()-1);
-		System.out.println(cseq.equals(cseq_c)); //should be true
+		System.out.println(cseq.equals(cseq.subSequence(0, cseq.length()))); //should be true
 		System.out.println(cseq.subSequence(1,4).subSequence(2)); //should print "e"
 	}
 }
