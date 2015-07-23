@@ -206,13 +206,14 @@ public class CompressedHashTrie {
 
 		return true;
 	}
-	
+
 	/**
 	 * Remove an entry from the trie.
 	 * @param e the entry
 	 */
 	public void remove(Entry e) {
 		String words[] = e.getDataStr().toLowerCase().split("\\s+");
+		System.out.printf("- remove %s\n", e);
 		for (int i = 0; i < words.length; i++) {
 			TrieHashNode tempNode = this.root.get(new TrieHashNode(words[i], null, null));
 			if (tempNode != null) {

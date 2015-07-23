@@ -1,3 +1,5 @@
+//TODO use ByteArrayCharSequence throughtout this DS
+
 /**
  * This is a the entry data type that holds 
  * the value of the ADD commmand
@@ -27,13 +29,13 @@ public class Entry implements Comparable<Entry>{
 	public Entry(String id, char type, float score, String dataStr) {
 	//	initialize values
 		this.id 	= id;
-		this.type 	= type;
+		this.type 	= type; //TODO error detection (u,t,q,b)
 		this.score	= score;
-		this.dataStr= dataStr;
+		this.dataStr= dataStr; //TODO make ByteArrayCharSequence
 	}
 	
 	/**
-	 * ID getter method.
+	 * id getter method.
 	 * @return the id
 	 */
 	public String getId() { 
