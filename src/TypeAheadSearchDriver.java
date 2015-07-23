@@ -1,3 +1,5 @@
+//TODO input error detection
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -9,23 +11,26 @@ import java.util.ArrayList;
 /* */
 public class TypeAheadSearchDriver {
 
-	/* */
+	/* Master map of all entries. */
 	public static DoubleHashedHashMap<Entry> allEntries;
 
-	/* */
+	/* Trie to store data strings */
 	public static CompressedHashTrie trie;
 
 	/* */
 	public static PrintWriter outputFile;
 
-	/* */
+	/**
+	 * 
+	 * @param lineScanner Scanner object
+	 */
 	public static void add(Scanner lineScanner) {
-		
+
 		/* Parse data. */
 		String type = lineScanner.next().toLowerCase();
 		String id = lineScanner.next();
 		float score = lineScanner.nextFloat();
-		String data = lineScanner.next();
+		String data = lineScanner.nextLine().substring(1);
 
 		/* Create temp entry to add to database. */
 		Entry tempEntry = new Entry(id, type.charAt(0), score, data);
@@ -37,6 +42,10 @@ public class TypeAheadSearchDriver {
 		trie.insert(tempEntry);
 	}
 
+	/**
+	 * 
+	 * @param lineScanner Scanner object
+	 */
 	public static void query(Scanner lineScanner) {
 		int numQuery = lineScanner.nextInt();
 		String queryString = lineScanner.nextLine();
@@ -44,6 +53,10 @@ public class TypeAheadSearchDriver {
 		//TODO output to file
 	}
 
+	/**
+	 * 
+	 * @param lineScanner Scanner object
+	 */
 	public static void wquery(Scanner lineScanner) {
 		int numQuery = lineScanner.nextInt();
 		int numBoost = lineScanner.nextInt();
@@ -60,14 +73,24 @@ public class TypeAheadSearchDriver {
 		//TODO output to file
 	}
 
+	/**
+	 * 
+	 * @param lineScanner Scanner object
+	 */
 	public static boolean remove(Scanner lineScanner) {
 		String id = lineScanner.next();
-		// int index = allEntries.findIndex(id);
+		
+		/* Create dummy instance of entry to remove. */
 		Entry tempEntry = allEntries.get(new Entry(id, 'a', 0, null));
 
 		if (tempEntry != null) {
-			//Entry tempEntry = (Entry) allEntries.getVal(index);
+			
+			/* Remove from trie. */
 			trie.remove(tempEntry);
+
+			/* Remove from master map. */
+			allEntries.remove(tempEntry);
+
 			return true;
 		} else {
 			return false;
@@ -81,6 +104,10 @@ public class TypeAheadSearchDriver {
 		System.out.println(allEntries);
 	}
 
+	/**
+	 * 
+	 * @param lineScanner Scanner object
+	 */
 	public static void readInput(Scanner input) {
 		int numTotalCommands = input.nextInt();
 		input.nextLine();
