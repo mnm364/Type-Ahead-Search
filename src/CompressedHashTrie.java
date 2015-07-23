@@ -1,9 +1,8 @@
+// Function prompt {"quora> "}
+
 /* NOTES
- * -do all the checks to see if got is char or string justify the overhead if everything was a
- * ^^string?
  * -midstring compression is not implemented yet
  * ^^b/c of this, inputting same string in twice will make the whole string single chars.. :(
-
  * Change entries to hash b/c of constant lookup time
  */
 
@@ -26,11 +25,10 @@ public class CompressedHashTrie {
 	private DoubleHashedHashMap<TrieHashNode> root;
 	
 	//TODO - when done change protected to private
-	/**
-	 * Nodes to be stored in the hashes in the trie
-	 */
+	/** Nodes to be stored in the hash maps of the trie. */
 	private class TrieHashNode {
-		/* Pointer to subsequent hash map. */
+		
+		/* Reference to child map. */
 		protected CompressedHashTrie child;
 
 		//	TODO - make this a skip list data structure (or a hashMap so constant lookup time)
@@ -105,7 +103,7 @@ public class CompressedHashTrie {
 
 		@Override
 		public String toString() {
-			return "(" + this.val.toString() + ":" + this.entries + ")" + "isLeaf:" + this.leaf;
+			return "(" + this.val.toString() + ":" + this.entries + ")" + "il:" + this.leaf;
 		}
 
 		@Override
@@ -210,7 +208,7 @@ public class CompressedHashTrie {
 	}
 	
 	/**
-	 * Remove an Entry from the trie.
+	 * Remove an entry from the trie.
 	 * @param e the entry
 	 */
 	public void remove(Entry e) {
@@ -224,8 +222,8 @@ public class CompressedHashTrie {
 	}
 
 	/**
-	 * Remove helper method; remove ...???
-	 * @param tempNode node looking in ...????
+	 * Remove helper method.
+	 * @param node node recursively removed from trie
 	 * @param seq word to remove from the trie
 	 * @param id the id of the entry to remove
 	 */
@@ -493,7 +491,7 @@ public class CompressedHashTrie {
 	/**
 	 * This method searches for the a String in the trie.
 	 * It fills the map with QueryEntry objects when it finds a node that should be
-	 * ing the map.
+	 * in the map.
 	 * @param node The query node
 	 * @param map The map of QueryEntries
 	 */
@@ -531,8 +529,12 @@ public class CompressedHashTrie {
 	}
 
 
+	public void breadthFirstTraversal() {
+		this.breadthFirstTraversal(this);
+	}
 	/**
 	 * Breadth first recursive traversal of trie.
+	 * for testing purposes
 	 * @param trie the root of the trie to traverse
 	 */
 	private void breadthFirstTraversal(CompressedHashTrie trie) {
@@ -603,13 +605,7 @@ public class CompressedHashTrie {
 		System.out.printf("\n3%s\n", trie);
 		trie.breadthFirstTraversal(trie);
 
-<<<<<<< HEAD
-		System.out.println("REMOVING STUFF");
-
-=======
-		//System.out.println("REMOVING STUFF");
-		
->>>>>>> 72388ff6d23dc76e8c0f4634ebe265209c41d7bd
+		System.out.println("TESTING search functionality:");
 
 		//normal search
 		System.out.println(trie.search(3, "b"));
@@ -633,13 +629,9 @@ public class CompressedHashTrie {
 		System.out.println(cseq.subSequence(0,3).hashCode());
 		ByteArrayCharSequence empty = new ByteArrayCharSequence("");
 		System.out.println(empty.hashCode());
-<<<<<<< HEAD
-		System.out.println(cseq.equals(cseq.subSequence(0, cseq.length()))); //should be true
-		System.out.println(cseq.subSequence(1,4).subSequence(2)); //should print "e"
-=======
+
 		ByteArrayCharSequence cseq_c = cseq.subSequence(0, cseq.length()-1);
 		System.out.println(cseq.equals(cseq_c)); //should be NOT true
 		System.out.println(cseq.subSequence(5,11).subSequence(3)); //should print "e"
->>>>>>> 72388ff6d23dc76e8c0f4634ebe265209c41d7bd
 	}
 }

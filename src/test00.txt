@@ -1,0 +1,15 @@
+
+4
+ADD user u1 10.1 Michael
+PRINT
+ADD user u2 9.4 SaRah
+PRINT
+ADD user u3 2.2 mark
+PRINT
+DEL u3
+PRINT
+ADD user u5 9 Michael
+ADD user u4 2.2 mirk
+PRINT
+ADD user u4 2.2 mIchaels
+PRINT

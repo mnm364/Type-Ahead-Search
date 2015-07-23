@@ -8,6 +8,7 @@ public class Entry implements Comparable<Entry>{
 	
 	/** Unique ID for each entry */
 	private String id;
+	// TODO ^^ can make this a charArray???
 	
 	/** Entry type (user | topic | question | board) */
 	private char type;
@@ -15,6 +16,7 @@ public class Entry implements Comparable<Entry>{
 	/** Score given to the entry to weight results */
 	private float score;
 	
+	/** Data string associated with entry. */
 	private String dataStr;
 	
 	/** Constructor 
@@ -69,7 +71,7 @@ public class Entry implements Comparable<Entry>{
 	@Override
 	public String toString() {
 		return this.id; //for testing
-		//return "id:" + this.id + ";type:" + this.type + ";score:" + Float.toString(this.score) + ";dataStr:" + this.dataStr;
+		// return "id:" + this.id + ";type:" + this.type + ";score:" + Float.toString(this.score) + ";dataStr:" + this.dataStr;
 	}
 	
 	@Override
@@ -86,12 +88,12 @@ public class Entry implements Comparable<Entry>{
 
 	@Override
 	public int hashCode() {
-		return super.hashCode();
+		return id.hashCode(); //TODO changed this, make sure still works well :)
 	}
 
 	@Override
 	public int compareTo(Entry obj) {
-		if (this.getClass() == obj.getClass()) {
+		if (this.getClass() == obj.getClass()) { //TODO why not instanceof?
 			Entry other = (Entry) obj; //TODO - warning here
 			if (other.score > this.score) {
 				return 1;

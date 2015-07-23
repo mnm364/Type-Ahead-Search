@@ -18,7 +18,7 @@ public class DoubleHashedHashMap<K> implements Iterable<K> {
 	private static final int REHASH_MULTIPYING_FACTOR = 2;
 	
 	/* The default initial capacity of the hash map. */
-	private static final int DEFAULT_INITIAL_CAPACITY = 3;
+	private static final int DEFAULT_INITIAL_CAPACITY = 3; //TODO change to 11
 
 	
 	/* The default load factor of the hash map. */
@@ -36,32 +36,20 @@ public class DoubleHashedHashMap<K> implements Iterable<K> {
 	/* The hash map. */
 	private K[] hashMap;
 	
-	/* The default constructor of the DoubleHashedHashMap. */
+	/* Default constructor for the DoubleHashedHashMap. */
 	public DoubleHashedHashMap() {
 		this(DEFAULT_INITIAL_CAPACITY);
-		// this.size = 0;
-		// this.loadFactor = DEFAULT_LOAD_FACTOR;
-		// this.initialCapacity = DEFAULT_INITIAL_CAPACITY;
-		// this.makeHash(this.initialCapacity);
 	}
-	
+
 	/**
 	 * The constructor for the DoubleHashedHashMap that takes
 	 * in the capacity.
 	 * @param capacity the initial capacity
 	 */
 	public DoubleHashedHashMap(int capacity) {
-		this.size = 0;
-		
-		if (capacity < 1) { //TODO - should this be < 1?
-			throw new IllegalArgumentException();
-		}
-		
-		this.loadFactor = DEFAULT_LOAD_FACTOR;
-		this.initialCapacity = capacity;
-		this.makeHash(this.initialCapacity);
+		this(DEFAULT_LOAD_FACTOR, capacity);
 	}
-	
+
 	/**
 	 * The constructor for the DoubleHashedHashMap that takes
 	 * in the load factor and the capacity.

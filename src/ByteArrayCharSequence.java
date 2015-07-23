@@ -1,6 +1,9 @@
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 
+/**
+ *
+ */
 public class ByteArrayCharSequence implements CharSequence, Serializable {
 	private static final long serialVersionUID = 042015;
 	private static final String ENCODING = "US-ASCII";
@@ -55,7 +58,6 @@ public class ByteArrayCharSequence implements CharSequence, Serializable {
 	 * @return the subsequence
 	 */
 	public ByteArrayCharSequence subSequence(int start) {
-		//return this.subSequence(start, this.end);
 		if (start < 0 || start > (end - offset)) {
 			throw new IllegalArgumentException("Illegal range " +
 				end + "-" + (this.end - offset) + " for sequence of length " + length()); 
@@ -101,13 +103,13 @@ public class ByteArrayCharSequence implements CharSequence, Serializable {
 		try {
 			return new String(data, offset, end - offset, ENCODING);
 		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException("Unexpected: US-ASCII not supported");
+			throw new RuntimeException("Unexpected: US-ASCII not supported\n");
 		}
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		if (o instanceof ByteArrayCharSequence) { //TODO - should I use getClass() instead?
+		if (o instanceof ByteArrayCharSequence) {
 			ByteArrayCharSequence that = (ByteArrayCharSequence) o;
 			if (this.length() == that.length()) {
 				for (int i = 0; i < this.length(); i++) {

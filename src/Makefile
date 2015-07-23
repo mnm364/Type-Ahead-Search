@@ -11,7 +11,9 @@ CLASSES = \
 	Set.java \
 	Boost.java \
 	QueryEntry.java \
-	ByteArrayCharSequence.java
+	ByteArrayCharSequence.java \
+	TypeAheadSearchDriver.java \
+	MinPQ.java
 
 default: classes
 
@@ -19,3 +21,6 @@ classes: $(CLASSES:.java=.class)
 
 clean:
 	rm *.class
+
+run:
+	java TypeAheadSearchDriver

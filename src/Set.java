@@ -68,7 +68,7 @@ public class Set<T> {
 		}
 		//move last to spot to overwrite and decrement size
 		this.theSet[index] = this.theSet[--this.size];
-        return true;
+		return true;
 	}
 
 	/** Search for an item in the set.
@@ -135,12 +135,12 @@ public class Set<T> {
 	 * @return index of object being searched for
 	 */
 	public int search(final Object o) {
-        for (int i = 0; i < size; i++) {
-            if (this.theSet[i].equals(o)) {
-                return i;
-            }
-        }
-        return -1; //nothing found
+		for (int i = 0; i < size; i++) {
+			if (this.theSet[i].equals(o)) {
+			return i;
+			}
+		}
+		return -1; //nothing found
 	}
 
 	@Override
@@ -149,11 +149,11 @@ public class Set<T> {
 			return "{}";
 		} else {
 			String str = "{";
-	    	for (int i = 0; i < this.size - 1; i++) {
-	    		str = str + this.theSet[i] + ", ";
-	    	}
-	    	str = str + this.theSet[this.size - 1] + "}";
-	    	return str;
+			for (int i = 0; i < this.size - 1; i++) {
+				str = str + this.theSet[i] + ", ";
+			}
+			str = str + this.theSet[this.size - 1] + "}";
+			return str;
 		}
 	}
 

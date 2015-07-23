@@ -1,0 +1,14 @@
+
+4
+ADD user u1 10.1 Michael
+ADD user u2 9.4 SaRah
+ADD user u3 2.2 mark
+PRINT
+DEL u3
+PRINT
+ADD user u4 2.2 mirk
+ADD user u5 9 Michael
+PRINT
+
+BUG REPORT:
+Michael is no longer a leaf node
