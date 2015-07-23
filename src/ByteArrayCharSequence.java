@@ -66,7 +66,7 @@ public class ByteArrayCharSequence implements CharSequence, Serializable {
 	public ByteArrayCharSequence append(ByteArrayCharSequence bar) {
 		byte[] n = new byte[this.length() + bar.length()];
 		System.arraycopy(this.data, 0, n, 0, this.length());
-		System.arraycopy(bar.getData(), 0, n, this.length(), bar.length());
+		System.arraycopy(bar.getData(), 0, n, 0, bar.length() + this.length()); //TODO, why is the destination at index 0?
 		return new ByteArrayCharSequence(n, this.offset, this.end + bar.length());
 	}
 
