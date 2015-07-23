@@ -14,42 +14,35 @@ import java.lang.Iterable;
  */
 public class DoubleHashedHashMap<K> implements Iterable<K> {
 	
-	/** The rehash multiplying factor.
-	 */
+	/* The rehash multiplying factor. */
 	private static final int REHASH_MULTIPYING_FACTOR = 2;
 	
-	/** The default initial capacity of the hash map.
-	 */
-	private static final int DEFAULT_INITIAL_CAPACITY = 11;
+	/* The default initial capacity of the hash map. */
+	private static final int DEFAULT_INITIAL_CAPACITY = 3;
 
 	
-	/** The default load factor of the hash map.
-	 */
+	/* The default load factor of the hash map. */
 	private static final double DEFAULT_LOAD_FACTOR = .75;
 	
-	/** The size of the hash map.
-	 */
+	/* The size of the hash map. */
 	private int size;
 	
-	/** The load factor of the hash map.
-	 */
+	/* The load factor of the hash map. */
 	private double loadFactor;
 	
-	/** The initial capacity of the hash map.
-	 */
+	/* The initial capacity of the hash map. */
 	private int initialCapacity;
 	
-	/** The hash map.
-	 */
+	/* The hash map. */
 	private K[] hashMap;
 	
-	/** The default constructor of the DoubleHashedHashMap.
-	 */
+	/* The default constructor of the DoubleHashedHashMap. */
 	public DoubleHashedHashMap() {
-		this.size = 0;
-		this.loadFactor = DEFAULT_LOAD_FACTOR;
-		this.initialCapacity = DEFAULT_INITIAL_CAPACITY;
-		this.makeHash(this.initialCapacity);
+		this(DEFAULT_INITIAL_CAPACITY);
+		// this.size = 0;
+		// this.loadFactor = DEFAULT_LOAD_FACTOR;
+		// this.initialCapacity = DEFAULT_INITIAL_CAPACITY;
+		// this.makeHash(this.initialCapacity);
 	}
 	
 	/**
@@ -61,8 +54,8 @@ public class DoubleHashedHashMap<K> implements Iterable<K> {
 		this.size = 0;
 		
 		if (capacity < 1) { //TODO - should this be < 1?
-            throw new IllegalArgumentException();
-        }
+			throw new IllegalArgumentException();
+		}
 		
 		this.loadFactor = DEFAULT_LOAD_FACTOR;
 		this.initialCapacity = capacity;
@@ -79,8 +72,8 @@ public class DoubleHashedHashMap<K> implements Iterable<K> {
 		this.size = 0;
 		
 		if (loadFactor <= 0 || capacity < 0) {
-            throw new IllegalArgumentException();
-        }
+			throw new IllegalArgumentException();
+		}
 		
 		this.loadFactor = loadFactor;
 		this.initialCapacity = capacity;
@@ -97,17 +90,15 @@ public class DoubleHashedHashMap<K> implements Iterable<K> {
 		int indexOfItem = this.findIndex(key);
 		if (indexOfItem == -1) {
 			//Item not in hash map
-			int hashValue = key.hashCode() % this.hashMap.length;
+			int index = key.hashCode() % this.hashMap.length;
 			
 			//TODO - can this ever happen?
-			if (hashValue < 0) {
-				hashValue *= -1;
+			if (index < 0) {
+				index *= -1;
 			}
 
 			boolean inserted = false;
-
-			int index = hashValue;
-			
+	
 			while(!inserted) {
 				K tempKey = this.hashMap[index];
 
@@ -121,9 +112,9 @@ public class DoubleHashedHashMap<K> implements Iterable<K> {
 			}
 
 			double tempLoadFactor = (double) this.size / this.hashMap.length;
-			//System.out.println("Temp Load Factor: " + tempLoadFactor);
+			// System.out.println("Temp Load Factor: " + tempLoadFactor);
 			if (tempLoadFactor >= this.loadFactor) {
-				//System.out.println("Going to rehash");
+				// System.out.println("Going to rehash");
 				this.rehash();
 			}
 
@@ -134,7 +125,7 @@ public class DoubleHashedHashMap<K> implements Iterable<K> {
 		}
 
 	}
-	
+
 	/**
 	 * This method returns the key if it exists in
 	 * the hash map, null otherwise.
@@ -148,24 +139,23 @@ public class DoubleHashedHashMap<K> implements Iterable<K> {
 		}
 		return null;
 	}
-	
+
 	/**
-	 * This method removes an object from a key.
+	 * This method removes an object from the map.
 	 * @param key the object to remove
-	 * @return true if removed, false otherwise
+	 * @return true if removed; false otherwise
 	 */
 	public boolean remove(K key) {
 		int index = this.findIndex(key);
 		
 		if (index != -1) {
 			this.hashMap[index] = null;
-            this.size--;
-            return true;
+			this.size--;
+			return true;
 		}
 		return false;
-		
 	}
-	
+
 	/**
 	 * This method determines if the hash map contains
 	 * a specified key.
@@ -203,7 +193,7 @@ public class DoubleHashedHashMap<K> implements Iterable<K> {
 	/**
 	 * This method finds the index of the key.
 	 * @param key the specified key
-	 * @return index of the key, -1 otherwise
+	 * @return index of the key; -1 otherwise
 	 */
 	private int findIndex(K key) {
 		int value = 0;
@@ -236,6 +226,7 @@ public class DoubleHashedHashMap<K> implements Iterable<K> {
 		return -1;
 	}
 
+	//TODO this is a work around and isnt the way it should be!!!
 	/**
 	 * This is the second hash function for the class.
 	 * @param key the key 
@@ -256,9 +247,10 @@ public class DoubleHashedHashMap<K> implements Iterable<K> {
 	 */
 	@SuppressWarnings("unchecked")
 	private void makeHash(int capacity) {
+		this.initialCapacity = capacity;
 		this.hashMap = (K[]) new Object[capacity];
 	}
-	
+
 	/**
 	 * This method rehashes the hash map to 2 times its
 	 * previous length and then adds the contents of the
@@ -267,12 +259,10 @@ public class DoubleHashedHashMap<K> implements Iterable<K> {
 	private void rehash() {
 		K[] tempHash = this.hashMap;
 		this.makeHash(this.hashMap.length * REHASH_MULTIPYING_FACTOR);
-		
+
 		this.size = 0;
-		
 		for (int i = 0; i < tempHash.length; i++) {
 			K tempKey = tempHash[i];
-			
 			if (tempKey == null) {
 				continue;
 			} else {
