@@ -235,7 +235,6 @@ public class DoubleHashedHashMap<K> implements Iterable<K> {
 	 */
 	@SuppressWarnings("unchecked")
 	private void makeHash(int capacity) {
-		this.initialCapacity = capacity;
 		this.hashMap = (K[]) new Object[capacity];
 	}
 
@@ -246,7 +245,8 @@ public class DoubleHashedHashMap<K> implements Iterable<K> {
 	 */
 	private void rehash() {
 		K[] tempHash = this.hashMap;
-		this.makeHash(this.hashMap.length * REHASH_MULTIPYING_FACTOR);
+		this.initialCapacity = this.hashMap.length * REHASH_MULTIPYING_FACTOR;
+		this.makeHash(this.initialCapacity);
 
 		this.size = 0;
 		for (int i = 0; i < tempHash.length; i++) {
