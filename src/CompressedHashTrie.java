@@ -35,7 +35,7 @@ public class CompressedHashTrie {
 		/* list of object references to unordered master Set */
 		protected Set<Entry> entries;
 
-		/* ASCII character data */
+		/* Data (sequence of chars) */
 		private ByteArrayCharSequence val;
 
 		/* Boolean to mark leaf nodes. */
@@ -213,8 +213,8 @@ public class CompressedHashTrie {
 	 */
 	public void remove(Entry e) {
 		String words[] = e.getDataStr().toLowerCase().split("\\s+");
-		System.out.printf("- remove %s\n", e);
 		for (int i = 0; i < words.length; i++) {
+			System.out.printf("- remove %s:{%s}\n", e, words[i]);
 			TrieHashNode tempNode = this.root.get(new TrieHashNode(words[i], null, null));
 			if (tempNode != null) {
 				this.remove(tempNode, new ByteArrayCharSequence(words[i]), e.getId());
@@ -235,8 +235,10 @@ public class CompressedHashTrie {
 		if (node.child != null) {
 			ByteArrayCharSequence value = node.getVal();
 
+			/* Find index of strings that start to differ. */
 			int index = compress(value, seq);
 
+			/* Create sequence starting at point of difference. */
 			seq = seq.subSequence(index);
 
 			TrieHashNode tempNode = null;
@@ -246,7 +248,7 @@ public class CompressedHashTrie {
 			}
 
 			if (tempNode != null) {
-				
+
 				//if the node is a leaf, it is safe to remove it
 				if (tempNode.isLeaf()) {
 
@@ -305,8 +307,8 @@ public class CompressedHashTrie {
 	 * This method gets two strings as input and finds the
 	 * index of the first character that is different between
 	 * the two strings.
-	 * @param first The first string
-	 * @param second The second string
+	 * @param first the first string
+	 * @param second the second string
 	 * @return index of the character that is different 
 	 */
 	private int compress(ByteArrayCharSequence first, ByteArrayCharSequence second) {
