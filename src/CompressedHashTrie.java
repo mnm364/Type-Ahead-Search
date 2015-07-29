@@ -274,6 +274,9 @@ public class CompressedHashTrie {
 
 				}
 				this.remove(tempNode, seq, id);
+			} else {
+				//This removes the node if the node is a leaf
+				this.root.remove(node);
 			}
 		}
 
