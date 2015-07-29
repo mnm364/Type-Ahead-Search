@@ -196,6 +196,8 @@ public class CompressedHashTrie {
 				node.changeStr(node.getVal().subSequence(index));
 				node.leaf = true;
 				tempNode.child.insert(node);
+			} else if (node.getVal().length() == index) {
+				tempNode.leaf = true;
 			}
 
 		//data doesn't exist in hash map yet
