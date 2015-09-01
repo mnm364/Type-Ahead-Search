@@ -1,4 +1,5 @@
 //What does this do?
+//It helps us do the searching
 
 public class QueryEntry {
 	private Entry entry;
