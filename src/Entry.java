@@ -123,7 +123,12 @@ public class Entry implements Comparable<Entry>{
 			} else if (other.score < this.score) {
 				return -1;
 			} else {
-				return 0;
+				//Both scores are equal, tie resolution
+				if (other.index > this.index) {
+					return 1;
+				} else {
+					return -1;
+				}
 			}
 		}
 		return 0;

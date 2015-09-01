@@ -352,31 +352,32 @@ public class CompressedHashTrie {
 	 * This method searches for the queryString in the map
 	 * @param numberOfResults The number of results wanted
 	 * @param queryString The query string
-	 * @return A list of entry ids
+	 * @return A list of entry ids interested in
 	 */
 	public List<String> search(int numberOfResults, String queryString) {
-		ArrayList<Entry> entryList = (ArrayList<Entry>) genericSearch(queryString);
-		Collections.sort(entryList);
+		ArrayList<Entry> entryList = (ArrayList<Entry>) genericSearch(numberOfResults, queryString);
+
 		ArrayList<String> idList = new ArrayList<String>();
 		
-		for (int i = 0; i < entryList.size(); i++) {
-			if (idList.size() < numberOfResults) {
-				idList.add(entryList.get(i).getId());
-			}
-		}
+		// for (int i = 0; i < entryList.size(); i++) {
+		// 	if (idList.size() < numberOfResults) {
+		// 		idList.add(entryList.get(i).getId());
+		// 	}
+		// }
 
 		return idList;
 	}
 
-
+//TODO implement for ties.
 	/**
 	 * This is a generic search method. 
 	 * @param queryString The string to find
+	 * @param numberOfResults size of PQ
 	 * @return The list of entry objects that have been found from the query
 	 */
-	private List<Entry> genericSearch(String queryString) {
+	private List<Entry> genericSearch(int numberOfResults, String queryString) {
 		DoubleHashedHashMap<QueryEntry> map = new DoubleHashedHashMap<QueryEntry>();
-		ArrayList<Entry> idList = new ArrayList<Entry>();
+		MinPQ<Entry> minpq = new MinPQ<>(numberOfResults);
 		String words[] = queryString.toLowerCase().split("\\s+");
 
 		/* insert individual words into trie */
@@ -391,8 +392,13 @@ public class CompressedHashTrie {
 			//checks if the entry is correct
 			if (tempEntry.getFrequency() == words.length) {
 				//limits the number of results returned
-				idList.add(tempEntry.getEntry());
+				minpq.insert(tempEntry.getEntry());
 			}
+		}
+
+		ArrayList<Entry> idList = new ArrayList<>();
+		for (int i = 0; i < minpq.size(); i++) {
+			idList.add(minpq.delMin());
 		}
 
 		return idList;
@@ -407,7 +413,7 @@ public class CompressedHashTrie {
 	 * @return A list of strings of ids
 	 */
 	public List<String> weightedSearch(int numberOfResults, String queryString, int numberOfBoosts, List<Boost> boosts) {
-		ArrayList<Entry> idListUnsorted = (ArrayList<Entry>) genericSearch(queryString);
+		ArrayList<Entry> idListUnsorted = (ArrayList<Entry>) genericSearch(numberOfResults, queryString);
 		
 		if (numberOfBoosts != 0) {
 			//Weight the search

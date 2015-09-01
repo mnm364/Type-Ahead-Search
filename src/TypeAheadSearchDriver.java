@@ -48,10 +48,13 @@ public class TypeAheadSearchDriver {
 	 * @param lineScanner Scanner object
 	 */
 	public static void query(Scanner lineScanner) {
+		
+		//TODO check numQuery < 20
 		int numQuery = lineScanner.nextInt();
 		String queryString = lineScanner.nextLine();
 		List<String> idList = trie.search(numQuery, queryString);
 		//TODO output to file
+		System.out.println(idList);
 	}
 
 	/**

@@ -13,3 +13,4 @@ ADD user u4 2.2 mirk
 PRINT
 ADD user u4 2.2 mIchaels
 PRINT
+QUERY 2 m
