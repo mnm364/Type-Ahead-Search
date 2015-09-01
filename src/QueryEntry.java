@@ -1,3 +1,4 @@
+//What does this do?
 
 public class QueryEntry {
 	private Entry entry;

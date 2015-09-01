@@ -23,8 +23,9 @@ public class TypeAheadSearchDriver {
 	/**
 	 * 
 	 * @param lineScanner Scanner object
+	 * @param addIndex index of the add
 	 */
-	public static void add(Scanner lineScanner) {
+	public static void add(Scanner lineScanner, int addIndex) {
 
 		/* Parse data. */
 		String type = lineScanner.next().toLowerCase();
@@ -33,9 +34,9 @@ public class TypeAheadSearchDriver {
 		String data = lineScanner.nextLine().substring(1);
 
 		/* Create temp entry to add to database. */
-		Entry tempEntry = new Entry(id, type.charAt(0), score, data);
+		Entry tempEntry = new Entry(id, type.charAt(0), score, addIndex, data);
 
-		/* Add to main map. */
+		/* Add to main id map. */
 		allEntries.put(tempEntry);
 
 		/* Add to trie. */
@@ -81,14 +82,14 @@ public class TypeAheadSearchDriver {
 		String id = lineScanner.next();
 		
 		/* Create dummy instance of entry to remove. */
-		Entry tempEntry = allEntries.get(new Entry(id, 'a', 0, null));
+		Entry tempEntry = allEntries.get(new Entry(id));
 
 		if (tempEntry != null) {
 			
 			/* Remove from trie. */
 			trie.remove(tempEntry);
 
-			/* Remove from master map. */
+			/* Remove from master id map. */
 			allEntries.remove(tempEntry);
 
 			return true;
@@ -105,10 +106,13 @@ public class TypeAheadSearchDriver {
 	}
 
 	/**
-	 * 
+	 * Parse input.
 	 * @param lineScanner Scanner object
 	 */
 	public static void readInput(Scanner input) {
+
+		int addIndex = 0;
+
 		int numTotalCommands = input.nextInt();
 		input.nextLine();
 		while (input.hasNext()) {
@@ -118,7 +122,8 @@ public class TypeAheadSearchDriver {
 				String command = lineScanner.next();
 				switch(command.toUpperCase()) {
 					case "ADD":
-						add(lineScanner);
+						add(lineScanner, addIndex);
+						addIndex++;
 						break;
 					case "QUERY":
 						query(lineScanner);
@@ -142,6 +147,12 @@ public class TypeAheadSearchDriver {
 	}
 
 	public static void main(String[] args) {
+		
+		/* check cmd line arguements */
+		if (args.length == 0) {
+			System.out.println("Proper Usage: ");
+			System.exit(0);
+		}
 		// TODO Auto-generated method stub
 		// TODO read in arguments 
 		trie = new CompressedHashTrie();
@@ -150,6 +161,7 @@ public class TypeAheadSearchDriver {
 		try {
 			input = new Scanner(new File(args[0]));
 		} catch (FileNotFoundException e) {
+			System.err.println("File" + args[0] + " not found.");
 			e.printStackTrace();
 		}
 

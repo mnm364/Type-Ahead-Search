@@ -4,10 +4,12 @@ ADD user u1 10.1 Michael
 PRINT
 ADD user u2 9.4 SaRah
 PRINT
-ADD user u3 2.2 mark gero
+ADD user u3 2.2 mark reeve gero
 PRINT
 DEL u3
 PRINT
 
 BUG REPORT:
 gero does not get removed from the trie
+
+SOLVED :)

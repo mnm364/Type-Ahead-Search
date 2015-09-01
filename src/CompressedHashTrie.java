@@ -330,7 +330,7 @@ public class CompressedHashTrie {
 				secondLetter = second.charAt(j);// + "";
 			}
 
-			if (firstLetter == charNull || secondLetter == charNull){
+			if (firstLetter == charNull || secondLetter == charNull) {
 				foundDiff = true;
 				if (i > j) {
 					i = j;
@@ -352,7 +352,7 @@ public class CompressedHashTrie {
 	 * This method searches for the queryString in the map
 	 * @param numberOfResults The number of results wanted
 	 * @param queryString The query string
-	 * @return A list of strings of ids
+	 * @return A list of entry ids
 	 */
 	public List<String> search(int numberOfResults, String queryString) {
 		ArrayList<Entry> entryList = (ArrayList<Entry>) genericSearch(queryString);

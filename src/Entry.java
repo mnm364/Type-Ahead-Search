@@ -8,32 +8,45 @@
  */
 public class Entry implements Comparable<Entry>{
 	
-	/** Unique ID for each entry */
+	/** Unique ID for each entry. */
 	private String id;
 	// TODO ^^ can make this a charArray???
 	
-	/** Entry type (user | topic | question | board) */
+	/** Entry type (user | topic | question | board). */
 	private char type;
 	
-	/** Score given to the entry to weight results */
+	/** Score given to the entry to weight results. */
 	private float score;
+
+	/** Index of entry to be used in event of score tie. */
+	private int index;
 	
 	/** Data string associated with entry. */
 	private String dataStr;
 	
-	/** Constructor 
+	/** 
+	 * Constructor for Entry object
 	 * @param id the unique id
 	 * @param type (user | topic | question | board) 
 	 * @param score used to weight results
+	 * @param index index of entry to be used in even of score tie
+	 * @param dataStr string to be associated with entry
 	 */
-	public Entry(String id, char type, float score, String dataStr) {
-	//	initialize values
+	public Entry(String id, char type, float score, int index, String dataStr) {
+		//	initialize values
 		this.id 	= id;
 		this.type 	= type; //TODO error detection (u,t,q,b)
 		this.score	= score;
+		this.index	= index;
 		this.dataStr= dataStr; //TODO make ByteArrayCharSequence
 	}
-	
+	public Entry(String id, char type, float score, String dataStr) {
+		this(id, type, score, 0, dataStr);
+	}
+	public Entry(String id) {
+		this(id, 'a', 0, 0, null);
+	}
+
 	/**
 	 * id getter method.
 	 * @return the id
@@ -41,7 +54,7 @@ public class Entry implements Comparable<Entry>{
 	public String getId() { 
 		return this.id;
 	}
-	
+
 	/**
 	 * Type getter method.
 	 * @return the type
@@ -58,6 +71,14 @@ public class Entry implements Comparable<Entry>{
 		return this.score;
 	}
 	
+	/** 
+	 * Index getter method.
+	 * @return the index
+	 */
+	public int getIndex() {
+		return this.index;
+	}
+
 	/**
 	 * Data string getter method.
 	 * @return the data string

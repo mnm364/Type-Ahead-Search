@@ -12,3 +12,5 @@ PRINT
 
 BUG REPORT:
 Michael is no longer a leaf node
+
+SOLVED :)
