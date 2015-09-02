@@ -359,6 +359,9 @@ public class CompressedHashTrie {
 
 		ArrayList<String> idList = new ArrayList<String>();
 		
+		for (int i = 0; i < entryList.size(); i++) {
+			idList.add(entryList.get(i).getId());
+		}
 		// for (int i = 0; i < entryList.size(); i++) {
 		// 	if (idList.size() < numberOfResults) {
 		// 		idList.add(entryList.get(i).getId());
@@ -446,7 +449,7 @@ public class CompressedHashTrie {
 						break;
 				}
 			}
-			
+
 			for (int i = 0; i < idListUnsorted.size(); i++) {
 				Entry tempEntry = idListUnsorted.get(i);
 				int boostValue = 0;
@@ -474,12 +477,12 @@ public class CompressedHashTrie {
 						break;
 					}
 				}
-				
+
 				if (boostValue != 0) {
 					tempEntry.setScore(boostValue);
 				}
 			}
-			
+
 			List <String> idList = new ArrayList<String>();
 			Collections.sort(idListUnsorted);
 			for (int i = 0; i < idListUnsorted.size(); i++) {
