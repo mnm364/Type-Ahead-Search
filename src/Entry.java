@@ -90,6 +90,10 @@ public class Entry implements Comparable<Entry>{
 	public void setScore(float score) {
 		this.score *= score;
 	}
+	
+	public void resetScore(float score) {
+		this.score = score;
+	}
 
 	@Override
 	public String toString() {

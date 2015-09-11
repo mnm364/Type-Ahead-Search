@@ -189,6 +189,9 @@ public class CompressedHashTrie {
 				TrieHashNode tempHashShorter = new TrieHashNode(value.subSequence(index), null, 
 						tempNode.getFirstEntry()); //TODO the child param is not neccessary in this constructor...
 				tempHashShorter.leaf = true;
+				for (int i = 0; i < tempNode.entries.size(); i++) {
+					tempHashShorter.addEntry((Entry)tempNode.entries.getVal(i));
+				}
 				tempNode.child.insert(tempHashShorter);
 			}
 
@@ -252,7 +255,7 @@ public class CompressedHashTrie {
 			if (tempNode != null) {
 
 				//if the node is a leaf, it is safe to remove it
-				if (tempNode.isLeaf()) {
+				if (tempNode.isLeaf() && tempNode.entries.size() == 1) {
 
 					node.child.root.remove(tempNode); //remove child
 
@@ -355,20 +358,28 @@ public class CompressedHashTrie {
 	 * @return A list of entry ids interested in
 	 */
 	public List<String> search(int numberOfResults, String queryString) {
-		ArrayList<Entry> entryList = (ArrayList<Entry>) genericSearch(numberOfResults, queryString);
+		if (numberOfResults > 0) {
+			ArrayList<Entry> entryList = (ArrayList<Entry>) genericSearch(numberOfResults, queryString);
 
-		ArrayList<String> idList = new ArrayList<String>();
-		
-		for (int i = 0; i < entryList.size(); i++) {
-			idList.add(entryList.get(i).getId());
+			ArrayList<String> idList = new ArrayList<String>();
+			
+			for (int i = 0; i < entryList.size(); i++) {
+				if (idList.size() < numberOfResults) {
+					idList.add(entryList.get(i).getId());
+				}
+			}
+			// for (int i = 0; i < entryList.size(); i++) {
+			// 	if (idList.size() < numberOfResults) {
+			// 		idList.add(entryList.get(i).getId());
+			// 	}
+			// }
+
+			return idList;
+		} else {
+			ArrayList<String> idList = new ArrayList<String>();
+			return idList;
 		}
-		// for (int i = 0; i < entryList.size(); i++) {
-		// 	if (idList.size() < numberOfResults) {
-		// 		idList.add(entryList.get(i).getId());
-		// 	}
-		// }
-
-		return idList;
+		 
 	}
 
 //TODO implement for ties.
@@ -424,6 +435,14 @@ public class CompressedHashTrie {
 			//Weight the search
 			Collections.sort(boosts);
 			
+			ArrayList<Entry> originalEntryList = new ArrayList<>();
+			
+			for (int i = 0; i < idListUnsorted.size(); i++) {
+				Entry tempEntry = idListUnsorted.get(i);
+				Entry newEntry = new Entry(tempEntry.getId(),tempEntry.getType(), tempEntry.getScore(), tempEntry.getIndex(), tempEntry.getDataStr());
+				originalEntryList.add(newEntry);
+			}
+			
 			//index 0: user
 			//index 1: topic
 			//index 2: question
@@ -454,7 +473,7 @@ public class CompressedHashTrie {
 
 			for (int i = 0; i < idListUnsorted.size(); i++) {
 				Entry tempEntry = idListUnsorted.get(i);
-				int boostValue = 0;
+				float boostValue = 0;
 				switch (tempEntry.getType()) {
 					case 'u':
 						boostValue += boostValues[0];
@@ -485,13 +504,22 @@ public class CompressedHashTrie {
 				}
 			}
 
+			Collections.sort(idListUnsorted);
+			
 			List <String> idList = new ArrayList<String>();
 			
 			for (int i = 0; i < idListUnsorted.size(); i++) {
+				Entry tempEntry = idListUnsorted.get(i);
+				
 				if (idList.size() < numberOfResults) {
-					idList.add(idListUnsorted.get(i).getId());
+					idList.add(tempEntry.getId());
 				}
+				
+				Entry originalEntry = originalEntryList.get(originalEntryList.indexOf(tempEntry));
+				
+				tempEntry.resetScore(originalEntry.getScore());
 			}
+			
 			return idList;
 			
 		} else {
