@@ -152,7 +152,7 @@ public class CompressedHashTrie {
 
 		/* insert individual words into trie */
 		for (int i = 0; i < words.length; i++) {
-			System.out.printf("- insert %s:{%s}\n", words[i],e);
+			//System.out.printf("- insert %s:{%s}\n", words[i],e);
 			//allEntries.add(e);
 			this.insert(new TrieHashNode(words[i], null, e));
 		}
@@ -216,7 +216,7 @@ public class CompressedHashTrie {
 	public void remove(Entry e) {
 		String words[] = e.getDataStr().toLowerCase().split("\\s+");
 		for (int i = 0; i < words.length; i++) {
-			System.out.printf("- remove %s:{%s}\n", e, words[i]);
+			// System.out.printf("- remove %s:{%s}\n", e, words[i]);
 			TrieHashNode tempNode = this.root.get(new TrieHashNode(words[i], null, null));
 			if (tempNode != null) {
 				this.remove(tempNode, new ByteArrayCharSequence(words[i]), e.getId());
@@ -392,6 +392,7 @@ public class CompressedHashTrie {
 		Iterator<QueryEntry> iterator = map.iterator();
 		while(iterator.hasNext()) {
 			QueryEntry tempEntry = iterator.next();
+
 			//checks if the entry is correct
 			if (tempEntry.getFrequency() == words.length) {
 				//limits the number of results returned
@@ -402,6 +403,7 @@ public class CompressedHashTrie {
 		ArrayList<Entry> idList = new ArrayList<>();
 		for (int i = 0; i < minpq.size(); i++) {
 			idList.add(minpq.delMin());
+			i--;
 		}
 
 		return idList;
@@ -484,7 +486,7 @@ public class CompressedHashTrie {
 			}
 
 			List <String> idList = new ArrayList<String>();
-			Collections.sort(idListUnsorted);
+			
 			for (int i = 0; i < idListUnsorted.size(); i++) {
 				if (idList.size() < numberOfResults) {
 					idList.add(idListUnsorted.get(i).getId());
@@ -494,7 +496,7 @@ public class CompressedHashTrie {
 			
 		} else {
 			List <String> idList = new ArrayList<String>();
-			Collections.sort(idListUnsorted);
+			
 			for (int i = 0; i < idListUnsorted.size(); i++) {
 				if (idList.size() < numberOfResults) {
 					idList.add(idListUnsorted.get(i).getId());

@@ -61,7 +61,7 @@ public class TypeAheadSearchDriver {
 	 * @param lineScanner Scanner object
 	 */
 	public static void wquery(Scanner lineScanner) {
-		int numQuery = lineScanner.nextInt();
+		int numRes = lineScanner.nextInt();
 		int numBoost = lineScanner.nextInt();
 		List<Boost> boostList = new ArrayList<Boost>();
 		for (int i = 0; i < numBoost; i++) {
@@ -71,8 +71,11 @@ public class TypeAheadSearchDriver {
 			Boost tempBoost = new Boost(boostId, boostValue);
 			boostList.add(tempBoost);
 		}
-		String queryString = lineScanner.nextLine();
-		List<String> idList = trie.weightedSearch(numQuery, queryString, numBoost, boostList);
+		String queryString = lineScanner.nextLine().substring(1);
+		List<String> idList = trie.weightedSearch(numRes, queryString, numBoost, boostList);
+
+		System.out.println(idList);
+
 		//TODO output to file
 	}
 
